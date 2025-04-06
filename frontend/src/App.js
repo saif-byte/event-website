@@ -23,6 +23,9 @@ function App() {
     <LoaderProvider>
       <Router>
         <Routes>
+          {/* Default route (redirect to home if nothing matches) */}
+          <Route path="/" element={<Navigate to="/home" />} />
+
           {/* Routes available only to non-authenticated users */}
           <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
           <Route path="/signup" element={<AuthRoute><SignupPage /></AuthRoute>} />
@@ -33,7 +36,7 @@ function App() {
           {/* Admin-only protected route */}
           <Route path="/dashboard" element={<AdminRoute><Dashboard /></AdminRoute>} />
 
-          {/* Default route (redirect to home if nothing matches) */}
+          {/* Catch-all route, redirect to home */}
           <Route path="*" element={<Navigate to="/home" />} />
         </Routes>
       </Router>
@@ -49,7 +52,6 @@ function App() {
         pauseOnHover
       />
     </LoaderProvider>
-    
   );
 }
 

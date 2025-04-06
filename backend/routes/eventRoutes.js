@@ -159,7 +159,7 @@ router.post("/:eventId/register", protect, async (req, res) => {
     // Send confirmation email
     await sendRegistrationEmail(user, event);
 
-    res.status(200).json({ message: "User registered successfully", event });
+    res.status(200).json({ message: "Successfully registered for the event", event });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
@@ -272,13 +272,13 @@ router.delete("/:eventId/unregister", protect, async (req, res) => {
   
       // Check if user is registered
       const isRegistered = event.registeredUsers.some((u) => u.userId.toString() === user.id);
-      if (!isRegistered) return res.status(400).json({ message: "User is not registered for this event" });
+      if (!isRegistered) return res.status(400).json({ message: "You are not registered for this event" });
   
       // Remove user from registeredUsers array
       event.registeredUsers = event.registeredUsers.filter((u) => u.userId.toString() !== user.id);
       await event.save();
   
-      res.status(200).json({ message: "User unregistered successfully", event });
+      res.status(200).json({ message: "Successfully unregistered for the event", event });
     } catch (error) {
       res.status(500).json({ message: "Server error", error });
     }
@@ -332,5 +332,54 @@ router.delete("/:eventId", protect, adminProtect, async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 });
+// @route   PUT /api/events/:eventId
+// @desc    Update an event (Admin Only)
+// @access  Private (Admin)
+router.put(
+  "/:eventId",
+  [
+    protect,          // Protect the route for authentication
+    adminProtect,     // Ensure the user is an admin
+    [
+      check("name", "Event name is required").optional().not().isEmpty(),
+      check("description", "Description is required").optional().not().isEmpty(),
+      check("startDate", "Start date is required").optional().isISO8601(),
+      check("endDate", "End date is required").optional().isISO8601(),
+      check("location", "Location is required").optional().not().isEmpty(),
+      check("maleSeats", "Number of male seats is required").optional().isInt({ min: 0 }),
+      check("femaleSeats", "Number of female seats is required").optional().isInt({ min: 0 }),
+      check("price", "Price is required").optional().isFloat({ min: 0 }),
+    ],
+  ],
+  async (req, res) => {
+    try {
+      const { eventId } = req.params;
+      const { name, description, startDate, endDate, location, maleSeats, femaleSeats, price } = req.body;
+
+      // Find the event by ID
+      const event = await Event.findById(eventId);
+      if (!event) return res.status(404).json({ message: "Event not found" });
+
+      // Update event fields (only updating allowed fields)
+      event.name = name || event.name;
+      event.description = description || event.description;
+      event.startDate = startDate || event.startDate;
+      event.endDate = endDate || event.endDate;
+      event.location = location || event.location;
+      event.maleSeats = maleSeats || event.maleSeats;
+      event.femaleSeats = femaleSeats || event.femaleSeats;
+      event.price = price || event.price;
+
+      // Save the updated event
+      await event.save();
+
+      // Return the updated event details
+      res.status(200).json({ message: "Event updated successfully", event });
+    } catch (error) {
+      console.error("Error updating event:", error);
+      res.status(500).json({ message: "Server error", error });
+    }
+  }
+);
 
 module.exports = router;

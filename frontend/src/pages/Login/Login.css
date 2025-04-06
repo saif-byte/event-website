@@ -134,3 +134,8 @@ input {
 .btn-instagram:hover {
   background: #b39ddb;
 }
+@media (max-width: 768px) {
+  .login-form {
+    width: 100%;
+  }
+}

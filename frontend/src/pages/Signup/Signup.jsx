@@ -3,9 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { apiCall } from "../../utils/api"; // Import API helper
 import Header from "../Header/Header"; // Import Header component
 import "./Signup.css";
-import { FaEye, FaEyeSlash,FaInstagram } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaInstagram } from 'react-icons/fa';
 import Carousel from "../../components/Carousel/Carousel";
-
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -23,12 +22,17 @@ export default function SignupPage() {
     confirmPassword: "",
   });
 
+  const instagramHandleRegex = /^(?!.*\.\.)(?!.*\.$)(?!^\.)[A-Za-z0-9._]{1,30}$/;
+
   const validateForm = () => {
     let newErrors = {};
 
     if (!formData.name.trim()) newErrors.name = "Name is required";
-    if (!formData.instagramHandle.trim()) newErrors.instagramHandle = "Instagram Handle is required";
-
+    if (!formData.instagramHandle.trim()) {
+      newErrors.instagramHandle = "Instagram Handle is required";
+    } else if (!instagramHandleRegex.test(formData.instagramHandle)) {
+      newErrors.instagramHandle = "Invalid Instagram handle.";
+    }
 
     if (!formData.email) {
       newErrors.email = "Email is required";
@@ -94,7 +98,7 @@ export default function SignupPage() {
       <main className="main-content">
         {/* Left Side - Testimonial */}
         <div className="testimonial-section">
-          <Carousel/>
+          <Carousel />
         </div>
 
         {/* Right Side - Signup Form */}
@@ -114,7 +118,6 @@ export default function SignupPage() {
             <div className="form-group">
               <input type="text" name="instagramHandle" placeholder="Instagram Handle" value={formData.instagramHandle} onChange={handleInputChange} />
               {errors.instagramHandle && <p className="error">{errors.instagramHandle}</p>}
-
             </div>
 
             <div className="form-group">
@@ -128,43 +131,43 @@ export default function SignupPage() {
             </div>
 
             <div className="form-group password-input-container">
-  <input 
-    type={showPassword ? "text" : "password"} 
-    name="password" 
-    placeholder="Password" 
-    value={formData.password} 
-    onChange={handleInputChange} 
-  />
-  <span className="password-toggle-icon" onClick={() => setShowPassword(!showPassword)}>
-    {showPassword ? <FaEyeSlash /> : <FaEye />}
-  </span>
-  {errors.password && <p className="error">{errors.password}</p>}
-</div>
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleInputChange}
+              />
+              <span className="password-toggle-icon" onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
+              {errors.password && <p className="error">{errors.password}</p>}
+            </div>
 
-<div className="form-group password-input-container">
-  <input 
-    type={showConfirmPassword ? "text" : "password"} 
-    name="confirmPassword" 
-    placeholder="Confirm Password" 
-    value={formData.confirmPassword} 
-    onChange={handleInputChange} 
-  />
-  <span className="password-toggle-icon" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-  </span>
-  {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
-</div>
-<button type="submit" className="btn-signin">Sign up</button>
-<p className="login-redirect">
-  Already have an account? <span onClick={() => navigate('/login')} className="login-link">Sign in</span>
-</p>          <div className="separator">Or Continue with</div>
+            <div className="form-group password-input-container">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
+                placeholder="Confirm Password"
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
+              />
+              <span className="password-toggle-icon" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+              </span>
+              {errors.confirmPassword && <p className="error">{errors.confirmPassword}</p>}
+            </div>
 
-          <button className="btn-instagram">
-            <FaInstagram className="icon" /> Instagram
-          </button>
-</form>
+            <button type="submit" className="btn-signin">Sign up</button>
+            <p className="login-redirect">
+              Already have an account? <span onClick={() => navigate('/login')} className="login-link">Sign in</span>
+            </p>
+            <div className="separator">Or Continue with</div>
 
-       
+            <button className="btn-instagram">
+              <FaInstagram className="icon" /> Instagram
+            </button>
+          </form>
         </div>
       </main>
     </div>

@@ -4,6 +4,7 @@ import "./ConfirmUnrsvpModal.css";
 const ConfirmUnrsvpModal = ({ event, onConfirm, onClose }) => {
   return (
     <div className="modal-overlay">
+      <div className="above-modal-content-unrsvp">
       <div className="modal-content-unrsvp">
         <h3>Are you sure you want to unregister from this event?</h3>
         <p>{event.name}</p>
@@ -15,7 +16,7 @@ const ConfirmUnrsvpModal = ({ event, onConfirm, onClose }) => {
             No, Cancel
           </button>
         </div>
-      </div>
+      </div></div>
     </div>
   );
 };

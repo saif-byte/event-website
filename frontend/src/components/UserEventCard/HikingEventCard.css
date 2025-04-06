@@ -75,7 +75,7 @@
     81.465% 0.219%
   );
   border-radius: 12px;
-  background: #d8b5ff;
+  background: var(--accent);
   min-width: 400px;
 }
 .inner-event-card-container {
@@ -270,5 +270,8 @@
 
   .event-description {
     font-size: 13px;
+  }
+  .event-card-container {
+    min-width: 350px;
   }
 }

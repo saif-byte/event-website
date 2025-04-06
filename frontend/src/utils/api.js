@@ -1,8 +1,9 @@
 import { toast } from 'react-toastify';
-
+import { useLoader } from '../context/LoaderContext';
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5001/api";
 
 export const apiCall = async (endpoint, method = "GET", data = null) => {
+  
   let token = localStorage.getItem("token")
   const headers = {
     "Content-Type": "application/json",
@@ -19,6 +20,7 @@ export const apiCall = async (endpoint, method = "GET", data = null) => {
   };
 
   try {
+  
     const response = await fetch(`${API_BASE_URL}${endpoint}`, options);
     const result = await response.json();
     if (response.status == 401) {
@@ -38,5 +40,8 @@ export const apiCall = async (endpoint, method = "GET", data = null) => {
   } catch (error) {
     console.error("API Error:", error);
     throw error;
+  }finally {
+    // Stop the loader after request finishes
+  
   }
 };

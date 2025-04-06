@@ -6,6 +6,7 @@ import locationIcon from "../../assets/icons/location.svg";
 export default function RSVPModal({ event,onConfirm ,  onClose }) {
   return (
     <div className="modal-overlay">
+      <div className="above-modal-content-rsvp">
       <div className="modal-content-rsvp">
         <h3>Thankyou for showing interest your are RSVP’D to the event</h3>
         <p>The Event Details are shown below and also been email to you</p>
@@ -34,6 +35,7 @@ export default function RSVPModal({ event,onConfirm ,  onClose }) {
           <button className="cancel-button-rsvp" onClick={onClose}>Cancel</button>
         </div>
       </div>
+    </div>
     </div>
   );
 }

@@ -4,7 +4,9 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { toast } from "react-toastify";
 import EventCard from "./EventCard";
 import { apiCall } from "../utils/api";
-const EventList = ({ events, loading, error, onSelectEvent }) => {
+// EventList.jsx
+
+const EventList = ({ events, loading, error, onSelectEvent, onEditEvent }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedEventId, setSelectedEventId] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -18,7 +20,6 @@ const EventList = ({ events, loading, error, onSelectEvent }) => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
-    setSelectedEventId(null);
   };
 
   const handleDeleteClick = () => {
@@ -30,13 +31,17 @@ const EventList = ({ events, loading, error, onSelectEvent }) => {
     try {
       await apiCall(`/events/${selectedEventId}`, "DELETE");
       toast.success("Event deleted successfully!");
-      // Optionally refresh the event list or remove the deleted event from the UI
       window.location.reload(); // Reload the page to reflect changes
     } catch (error) {
       toast.error(error.message || "Failed to delete event");
     } finally {
       setDeleteDialogOpen(false);
     }
+  };
+
+  const handleEditClick = () => {
+    handleMenuClose();
+    onEditEvent(selectedEventId); // Pass selected event to be edited
   };
 
   return (
@@ -64,6 +69,7 @@ const EventList = ({ events, loading, error, onSelectEvent }) => {
                   open={Boolean(anchorEl) && selectedEventId === event._id}
                   onClose={handleMenuClose}
                 >
+                  <MenuItem onClick={handleEditClick}>Edit Event</MenuItem>
                   <MenuItem onClick={handleDeleteClick}>Delete Event</MenuItem>
                 </Menu>
               </>

@@ -7,7 +7,7 @@ import Sidebar from "../../components/Sidebar/Sidebar";
 import AddEventModal from "../../components/AddEventModal/AddEventModal";
 import "./Dashboard.css";
 import Header from "../Header/Header";
-import Pagination from "../../components/Pagination/Pagination"
+import Pagination from "../../components/Pagination/Pagination";
 
 const Dashboard = () => {
   const [events, setEvents] = useState([]);
@@ -17,6 +17,7 @@ const Dashboard = () => {
   const [registeredUsers, setRegisteredUsers] = useState([]);
   const [activeTab, setActiveTab] = useState("events"); // Default tab
   const [openAddModal, setOpenAddModal] = useState(false); // Modal state
+  const [eventToEdit, setEventToEdit] = useState(null); // Store event to edit
   
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -56,13 +57,23 @@ const Dashboard = () => {
     }
   };
 
+  // Logic to handle editing an event
+  const handleEditEvent = (eventId) => {
+    const eventToEdit = events.find(event => event._id === eventId);
+    setEventToEdit(eventToEdit); // Set the event to edit
+    setOpenAddModal(true); // Open the modal to edit
+  };
+
   // Pagination logic
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
   };
-
+  const onAddEventClick = () => {
+    setEventToEdit(null); // Reset eventToEdit for adding a new event
+    setOpenAddModal(true); // Open the modal for adding a new event
+  };
   const totalPages = Math.ceil(totalRecords / pageSize);
 
   return (
@@ -81,7 +92,7 @@ const Dashboard = () => {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => setOpenAddModal(true)}
+                onClick={() => onAddEventClick()}
                 style={{ marginBottom: "15px" }}
               >
                 + Add Event
@@ -98,18 +109,17 @@ const Dashboard = () => {
                   loading={loading}
                   error={error}
                   onDeleteEvent={handleDeleteEvent}
-
                   onSelectEvent={fetchRegisteredUsers}
+                  onEditEvent={handleEditEvent} // Pass handleEditEvent to EventList
                 />
               )}
 
               {/* Pagination Controls */}
-                 
-           <Pagination 
-             currentPage={currentPage}
-             totalPages={totalPages}
-             onPageChange={handlePageChange}
-           />
+              <Pagination 
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
             </>
           )}
 
@@ -122,6 +132,7 @@ const Dashboard = () => {
         open={openAddModal}
         onClose={() => setOpenAddModal(false)}
         refreshEvents={fetchEvents}
+        eventToEdit={eventToEdit} // Pass eventToEdit to modal for editing
       />
     </>
   );

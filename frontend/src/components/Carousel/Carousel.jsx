@@ -6,19 +6,19 @@ const testimonials = [
     id: 1,
     text: "The staff were friendly and attentive, ensuring everything ran smoothly. I also loved the interactive elements that allowed attendees to connect and participate.",
     author: "John Doe",
-    image: "https://images.pexels.com/photos/1190297/pexels-photo-1190297.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+    image: "https://images.pexels.com/photos/29681709/pexels-photo-29681709/free-photo-of-diverse-group-on-religious-pilgrimage-in-mountainous-area.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
   },
   {
     id: 2,
     text: "What an amazing experience! The venue was perfect and the organization was flawless. Would definitely recommend to anyone looking for a memorable event.",
     author: "Jane Smith",
-    image: "https://images.pexels.com/photos/919734/pexels-photo-919734.jpeg?auto=compress&cs=tinysrgb&w=600"
+    image: "https://images.pexels.com/photos/13911084/pexels-photo-13911084.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
   },
   {
     id: 3,
     text: "I was impressed by the attention to detail. From the decorations to the schedule, everything was thoughtfully planned and executed beautifully.",
     author: "Alex Johnson",
-    image: "https://images.pexels.com/photos/919734/pexels-photo-919734.jpeg?auto=compress&cs=tinysrgb&w=600"
+    image: "https://images.pexels.com/photos/31432923/pexels-photo-31432923/free-photo-of-stargazing-under-the-milky-way-at-campsite.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
   }
 ];
 
