@@ -5,6 +5,7 @@ import Header from "../Header/Header"; // Import Header component
 import "./Signup.css";
 import { FaEye, FaEyeSlash, FaInstagram } from 'react-icons/fa';
 import Carousel from "../../components/Carousel/Carousel";
+import { toast } from "react-toastify";
 
 export default function SignupPage() {
   const navigate = useNavigate();
@@ -82,7 +83,7 @@ export default function SignupPage() {
       };
 
       await apiCall("/auth/signup", "POST", data);
-      alert("Signup successful! Redirecting to login...");
+      toast.success("Signup successful");
       navigate("/login");
     } catch (error) {
       alert(error.message);
