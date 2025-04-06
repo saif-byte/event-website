@@ -1,0 +1,178 @@
+/* Container */
+.signup-container {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Main Content */
+.main-content {
+  display: flex;
+  flex: 1;
+}
+
+/* Testimonial Section */
+.testimonial-section {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Sign Up Form Section */
+.signup-form-section {
+  flex: 1;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  background-color: white;
+}
+
+.welcome-title {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.signup-form {
+  width: 80%;
+  /* max-width: 450px; */
+}
+
+.form-group {
+  position: relative;
+  margin-bottom: 15px;
+  width: 100%;
+}
+
+.form-group input,
+.form-group select,
+.btn-signin,
+.btn-instagram {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  background: #ffffc5;
+  padding: 10px 15px;
+  border-radius: 5px;
+  border: 1px solid #754480;
+  font-size: 16px;
+  height: 45px;
+}
+
+.input-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+}
+
+.form-group select {
+  appearance: menulist;
+  padding-right: 20px;
+}
+
+/* Button styling */
+.btn-signin,
+.btn-instagram {
+  width: 100%;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-signin {
+  background: #cec4ff;
+  margin-bottom: 10px;
+}
+
+.btn-instagram {
+  background: #cec4ff;
+}
+
+.btn-signin:hover,
+.btn-instagram:hover {
+  background: #b39ddb;
+}
+
+/* Password toggle */
+.password-input-container {
+  position: relative;
+  width: 100%;
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  user-select: none;
+  z-index: 2;
+}
+
+/* Error messages */
+.error {
+  font-size: 14px;
+  font-weight: 600;
+  padding: 0px;
+  margin: 0px;
+  color: red;
+}
+
+/* Separator */
+.separator {
+  text-align: center;
+  margin: 15px 0;
+  font-size: 14px;
+  color: #777;
+  width: 100%;
+}
+
+/* Login redirect */
+.login-redirect {
+  margin-top: 5px;
+  text-align: center;
+  width: 100%;
+}
+
+.login-link {
+  color: #754480;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.login-link:hover {
+  color: #5a3463;
+}
+
+/* Icon in button */
+.icon {
+  margin-right: 10px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column;
+  }
+
+  .testimonial-section {
+    display: none;
+  }
+
+  .signup-form-section {
+    padding: 20px;
+  }
+
+  .signup-form {
+    width: 100%;
+  }
+}

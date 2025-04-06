@@ -1,0 +1,136 @@
+/* General Container */
+.login-container {
+  display: flex;
+  height: calc(100vh - 150px);
+}
+
+/* Left Section (Image & Quote) */
+.left-section {
+  flex: 1;
+  background: #ffffc5;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.image-overlay {
+  background: rgba(255, 255, 153, 0.8);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  max-width: 80%;
+}
+
+.quote {
+  font-style: italic;
+  color: #333;
+}
+
+.quote-author {
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* Right Section (Login Form) */
+.right-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #f8f8f8;
+  padding: 40px;
+  gap: 24px;
+  height: 100%;
+}
+
+.welcome-title {
+  font-size: 36px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.login-form {
+  width: 80%;
+}
+
+/* Input Fields */
+.input-group {
+  display: flex;
+  align-items: center;
+  background: #ffffc5;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  border: 1px solid #754480;
+}
+
+.input-group .icon {
+  margin-right: 10px;
+  color: #333;
+}
+
+input {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 16px;
+  background: transparent;
+}
+
+/* Sign In Button */
+.btn-signin {
+  width: 100%;
+  font-weight: bold;
+  background: #cec4ff;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #754480;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.btn-signin:hover {
+  background: #b39ddb;
+}
+
+/* Forgot Password */
+.forgot-password {
+  text-align: right;
+  font-size: 14px;
+  cursor: pointer;
+  color: #333;
+}
+
+/* Separator */
+.separator {
+  text-align: center;
+  margin: 15px 0;
+  font-size: 14px;
+  color: #777;
+}
+
+/* Instagram Button */
+.btn-instagram {
+  width: 100%;
+  background: #cec4ff;
+  font-weight: bold;
+
+  padding: 12px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-instagram .icon {
+  margin-right: 10px;
+}
+
+.btn-instagram:hover {
+  background: #b39ddb;
+}
