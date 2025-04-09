@@ -1,0 +1,22 @@
+{
+  "files": {
+    "main.css": "/static/css/main.f89aa974.css",
+    "main.js": "/static/js/main.44c52533.js",
+    "static/js/453.8ab44547.chunk.js": "/static/js/453.8ab44547.chunk.js",
+    "static/media/home.svg": "/static/media/home.c68063a3ecb78dbc1259aee368dfb6d2.svg",
+    "static/media/price-purple.svg": "/static/media/price-purple.e0915ed166262a0893a6467575d7142c.svg",
+    "static/media/date-range-purple.svg": "/static/media/date-range-purple.18b320633ab6e52cb3a3e7c0d6de4a67.svg",
+    "static/media/price.svg": "/static/media/price.3ffc9ac0ab65fa9d67445b5e9c446de9.svg",
+    "static/media/search.svg": "/static/media/search.1578420a440d7515ae4e.svg",
+    "static/media/location.svg": "/static/media/location.c8420e6c9dbefdae38bf5af9ceaa8e97.svg",
+    "index.html": "/index.html",
+    "static/media/date-range.svg": "/static/media/date-range.b24b127ce9ee51ec207fc1cc5dcb4827.svg",
+    "main.f89aa974.css.map": "/static/css/main.f89aa974.css.map",
+    "main.44c52533.js.map": "/static/js/main.44c52533.js.map",
+    "453.8ab44547.chunk.js.map": "/static/js/453.8ab44547.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.f89aa974.css",
+    "static/js/main.44c52533.js"
+  ]
+}

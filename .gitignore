@@ -26,7 +26,6 @@ yarn-error.log*
 /frontend/node_modules
 /frontend/.pnp
 /frontend.pnp.js
-/frontend/build
 /frontend/.env*
 
 # Backend-specific (if it's a Node.js backend, for example)
