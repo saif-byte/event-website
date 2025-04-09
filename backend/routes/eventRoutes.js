@@ -7,7 +7,12 @@ const Event = require("../models/Event");
 const { protect, optionalProtect, adminProtect } = require("../middleware/authMiddleware");
 const nodemailer = require("nodemailer");
 const mongoose = require('mongoose');
+const SibApiV3Sdk = require('sib-api-v3-sdk');
 
+// Configure Brevo client
+const defaultClient = SibApiV3Sdk.ApiClient.instance;
+const apiKey = defaultClient.authentications['api-key'];
+apiKey.apiKey = process.env.BREVO_API_KEY; // Store API
 
 // @route   GET /api/events
 // @desc    Get all events (public), if authenticated, include `isAlreadyRegistered`
@@ -168,95 +173,43 @@ router.post("/:eventId/register", protect, async (req, res) => {
 // Helper function to send registration confirmation email
 const sendRegistrationEmail = async (user, event) => {
   try {
-    // Create a Nodemailer transporter
-    const transporter = nodemailer.createTransport({
-      service: "gmail", // You can use other services like SendGrid, Mailgun, etc.
-      auth: {
-        user: process.env.EMAIL_USER,  // Use environment variable for email
-        pass: process.env.EMAIL_PASS,  // Use environment variable for email password or App Password
-      },
-    });
+    const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
-    // HTML content for the email
-    const htmlContent = `
-      <!DOCTYPE html>
-      <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Event Registration Confirmation</title>
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-          }
-          .container {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-          }
-          h1 {
-            color: #333;
-          }
-          p {
-            font-size: 16px;
-            color: #555;
-          }
-          .btn {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 5px;
-            text-decoration: none;
-            text-align: center;
-            display: inline-block;
-          }
-          .footer {
-            margin-top: 20px;
-            font-size: 12px;
-            color: #777;
-            text-align: center;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <h1>Registration Successful!</h1>
-          <p>Dear ${user.name},</p>
-          <p>Congratulations! You have successfully registered for the event <strong>${event.name}</strong>.</p>
-          <p>The event will take place on <strong>${new Date(event.startDate).toLocaleDateString()}</strong> at <strong>${event.location}</strong>.</p>
-          <p>We are excited to see you there!</p>
-          <p>Best regards, <br/> The Event Team</p>
-          <div class="footer">
-            <p>&copy; 2025 Event Website. All Rights Reserved.</p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
-
-    // Email options
-    const mailOptions = {
-      from: process.env.EMAIL_USER, // Your email (use environment variable)
-      to: user.email, // User's email
+    const sendSmtpEmail = {
+      to: [{ email: user.email, name: user.name }],
+      sender: { email: process.env.SENDER_EMAIL, name: "Event Team" },
       subject: `Successfully Registered for ${event.name}`,
-      html: htmlContent,
+      htmlContent: `
+       <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Registration Confirmation</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+  <div style="width: 100%; max-width: 600px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);">
+    <h1 style="color: #333;">Registration Successful!</h1>
+    <p style="font-size: 16px; color: #555;">Dear ${user.name},</p>
+    <p style="font-size: 16px; color: #555;">Congratulations! You have successfully registered for the event <strong>${event.name}</strong>.</p>
+    <p style="font-size: 16px; color: #555;">The event will take place on <strong>${new Date(event.startDate).toLocaleDateString()}</strong> at <strong>${event.location}</strong>.</p>
+    <p style="font-size: 16px; color: #555;">We are excited to see you there!</p>
+    <p style="font-size: 16px; color: #555;">Best regards, <br/> The Event Team</p>
+    <div style="margin-top: 20px; font-size: 12px; color: #777; text-align: center;">
+      <p>&copy; 2025 Event Website. All Rights Reserved.</p>
+    </div>
+  </div>
+</body>
+</html>
+      `
     };
 
-    // Send the email
-    await transporter.sendMail(mailOptions);
-    console.log("Registration email sent successfully!");
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log("Registration email sent via Brevo!");
   } catch (error) {
-    console.error("Error sending email:", error);
+    console.error("Error sending email with Brevo:", error);
   }
 };
-
 
 // @route   DELETE /api/events/:eventId/unregister
 // @desc    Unregister a user from an event
