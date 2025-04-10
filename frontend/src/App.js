@@ -3,6 +3,8 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import { LoaderProvider } from "./context/LoaderContext";
 import SignupPage from "./pages/Signup/Signup";
 import Home from "./pages/Home/Home";
+import FAQ from "./pages/FAQ/Faq";
+
 import Login from "./pages/Login/Login";
 import { ToastContainer } from 'react-toastify';
 
@@ -32,6 +34,8 @@ function App() {
 
           {/* Route available to everyone */}
           <Route path="/home" element={<Home />} />
+          <Route path="/faq" element={<FAQ />} />
+
 
           {/* Admin-only protected route */}
           <Route path="/dashboard" element={<AdminRoute><Dashboard /></AdminRoute>} />

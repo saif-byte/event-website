@@ -52,7 +52,7 @@ export default function Header() {
             <a href="#shop">Shop</a>
           </div>
         </div>
-        <button className="header-button">FAQ</button>
+        <button className="header-button" onClick={() => navigate("/faq")}>FAQ</button>
         <button className="header-button">Contact</button>
       </div>
 
@@ -66,7 +66,7 @@ export default function Header() {
               <a href="#shop">Shop</a>
             </div>
           </div>
-          <button className="mobile-nav-item">FAQ</button>
+          <button className="mobile-nav-item" onClick={() => navigate("/home")}>FAQ</button>
           <button className="mobile-nav-item">Contact</button>
           
           {isLoggedIn ? (
