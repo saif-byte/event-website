@@ -4,6 +4,7 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const eventRoutes = require("./routes/eventRoutes");
+const contactRoutes = require("./routes/contactRoutes");
 require('dotenv').config();
 
 
@@ -23,6 +24,8 @@ app.use(express.json()); // Parse incoming JSON requests
 // Routes
 app.use("/api/auth", authRoutes); // Authentication routes
 app.use("/api/events", eventRoutes);
+app.use('/api/contact', contactRoutes); // Contact form routes
+
 
 // Default route
 app.get("/", (req, res) => {

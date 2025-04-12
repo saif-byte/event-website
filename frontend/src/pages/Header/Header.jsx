@@ -53,7 +53,7 @@ export default function Header() {
           </div>
         </div>
         <button className="header-button" onClick={() => navigate("/faq")}>FAQ</button>
-        <button className="header-button">Contact</button>
+        <button className="header-button" onClick={() => navigate("/contact")}>Contact</button>
       </div>
 
       {/* Mobile menu */}
@@ -67,7 +67,7 @@ export default function Header() {
             </div>
           </div>
           <button className="mobile-nav-item" onClick={() => navigate("/home")}>FAQ</button>
-          <button className="mobile-nav-item">Contact</button>
+          <button className="mobile-nav-item" onClick={() => navigate("/contact")}>Contact</button>
           
           {isLoggedIn ? (
             <button className="mobile-nav-item" onClick={handleLogout}>Logout</button>

@@ -7,6 +7,7 @@ import FAQ from "./pages/FAQ/Faq";
 
 import Login from "./pages/Login/Login";
 import { ToastContainer } from 'react-toastify';
+import Contact from "./pages/Contact/Contact";
 
 // Protected route for non-authenticated users (Login, Signup)
 const AuthRoute = ({ children }) => {
@@ -35,6 +36,8 @@ function App() {
           {/* Route available to everyone */}
           <Route path="/home" element={<Home />} />
           <Route path="/faq" element={<FAQ />} />
+          <Route path="/contact" element={<Contact />} />
+
 
 
           {/* Admin-only protected route */}
