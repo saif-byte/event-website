@@ -46,6 +46,7 @@ const EventList = ({ events, loading, error, onSelectEvent, onEditEvent }) => {
 
   return (
     <div className="events-list">
+      
       {loading ? (
         <Typography>Loading events...</Typography>
       ) : error ? (

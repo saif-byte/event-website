@@ -21,6 +21,11 @@ const Sidebar = ({ onSelectTab, activeTab }) => {
       icon: <GroupIcon sx={{ fontSize: 22 }} />,
       tab: "users",
     },
+    {
+      text: "Contacts",
+      icon: <GroupIcon sx={{ fontSize: 22 }} />,
+      tab: "contacts",
+    },
   ];
 
   return (

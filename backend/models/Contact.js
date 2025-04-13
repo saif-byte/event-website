@@ -25,7 +25,9 @@ const ContactSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
-  }
+  },
+  isSeen: { type: Boolean, default: false }, // New field for admin tracking
+
 });
 
 module.exports = mongoose.model("Contact", ContactSchema);
