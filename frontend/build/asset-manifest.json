@@ -1,22 +1,26 @@
 {
   "files": {
-    "main.css": "/static/css/main.f89aa974.css",
-    "main.js": "/static/js/main.44c52533.js",
+    "main.css": "/static/css/main.9a2f147f.css",
+    "main.js": "/static/js/main.cfa8f868.js",
     "static/js/453.8ab44547.chunk.js": "/static/js/453.8ab44547.chunk.js",
-    "static/media/home.svg": "/static/media/home.c68063a3ecb78dbc1259aee368dfb6d2.svg",
-    "static/media/price-purple.svg": "/static/media/price-purple.e0915ed166262a0893a6467575d7142c.svg",
-    "static/media/date-range-purple.svg": "/static/media/date-range-purple.18b320633ab6e52cb3a3e7c0d6de4a67.svg",
-    "static/media/price.svg": "/static/media/price.3ffc9ac0ab65fa9d67445b5e9c446de9.svg",
-    "static/media/search.svg": "/static/media/search.1578420a440d7515ae4e.svg",
-    "static/media/location.svg": "/static/media/location.c8420e6c9dbefdae38bf5af9ceaa8e97.svg",
+    "static/media/home.svg": "/static/media/home.676feb546928d3eedf8139cbc5e8f23e.svg",
+    "static/media/faq.png": "/static/media/faq.ad3e21d34ee06f9aca2f.png",
+    "static/media/input.svg": "/static/media/input.fdfa26f5adc4f5e6a35c5f43cbc7b77f.svg",
+    "static/media/price-purple.svg": "/static/media/price-purple.665bb8c3d3aa3347a3bf1bde5b3e22b1.svg",
+    "static/media/phone.svg": "/static/media/phone.8b5535e7d245298cbd074fae0a95c054.svg",
+    "static/media/date-range-purple.svg": "/static/media/date-range-purple.9542441d1b1962d39910cdca47fa40c8.svg",
+    "static/media/price.svg": "/static/media/price.39c670295056a9291e184bb1805d168c.svg",
+    "static/media/search.svg": "/static/media/search.9f3e244d9d5306779489.svg",
+    "static/media/email.svg": "/static/media/email.13e368c8fa2a694cb0d86c7f0927ecb7.svg",
+    "static/media/location.svg": "/static/media/location.2c55e310ce3afe3f110f377aa0b1ed98.svg",
     "index.html": "/index.html",
-    "static/media/date-range.svg": "/static/media/date-range.b24b127ce9ee51ec207fc1cc5dcb4827.svg",
-    "main.f89aa974.css.map": "/static/css/main.f89aa974.css.map",
-    "main.44c52533.js.map": "/static/js/main.44c52533.js.map",
+    "static/media/date-range.svg": "/static/media/date-range.62433d5cf4f47a6e94da841dd6d78cb2.svg",
+    "main.9a2f147f.css.map": "/static/css/main.9a2f147f.css.map",
+    "main.cfa8f868.js.map": "/static/js/main.cfa8f868.js.map",
     "453.8ab44547.chunk.js.map": "/static/js/453.8ab44547.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.f89aa974.css",
-    "static/js/main.44c52533.js"
+    "static/css/main.9a2f147f.css",
+    "static/js/main.cfa8f868.js"
   ]
 }
