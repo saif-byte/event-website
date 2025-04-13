@@ -1,6 +1,7 @@
 import { toast } from 'react-toastify';
-import { useLoader } from '../context/LoaderContext';
 const API_BASE_URL = "https://sandiegoadventurehub.onrender.com/api";
+// const API_BASE_URL = "http://localhost:5001/api";
+
 
 export const apiCall = async (endpoint, method = "GET", data = null) => {
   
@@ -26,11 +27,14 @@ export const apiCall = async (endpoint, method = "GET", data = null) => {
     if (response.status == 401) {
     localStorage.clear()
       window.location.href = "/login"; 
+      console.log("first")
       toast.error("Session Expired, Please Login Again", {
         position: "top-center",  // You can change this based on your preference
         autoClose: 5000,        // Time in ms before the toast disappears
         hideProgressBar: true,  // Hide the progress bar
       });     
+      console.log("second")
+
     }
     if (!response.ok) {
       throw new Error(result.message || "Something went wrong");
