@@ -8,7 +8,7 @@ export default function RSVPModal({ event,onConfirm ,  onClose }) {
     <div className="modal-overlay">
       <div className="above-modal-content-rsvp">
       <div className="modal-content-rsvp">
-        <h3>Thankyou for showing interest your are RSVP’D to the event</h3>
+        <h3>Thank you for your interest.</h3>
         <p>The Event Details are shown below and also been email to you</p>
 
         <div className="event-info">
