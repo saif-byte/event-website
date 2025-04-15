@@ -19,54 +19,51 @@ apiKey.apiKey = process.env.BREVO_API_KEY; // Store API
 // @access  Public (with optional authentication)
 router.get("/", optionalProtect, async (req, res) => {
   try {
-    // Get query parameters for pagination, search, and page size
     const { page = 1, pageSize = 10, search = "" } = req.query;
-
-    // Calculate skip (offset) for pagination
     const skip = (page - 1) * pageSize;
 
-    // Define the search filter (event name search)
     const searchFilter = search
-      ? { name: { $regex: search, $options: "i" } } // case-insensitive search
+      ? { name: { $regex: search, $options: "i" } }
       : {};
 
-    // Fetch events with pagination and search filter
     const events = await Event.find(searchFilter)
-      .select("-registeredUsers") // Exclude registeredUsers from the result
-      .skip(skip) // Skip the records for pagination
-      .limit(Number(pageSize)) // Limit to pageSize
-      .sort({ createdAt: -1 }); // Optional: Sort by created date, you can adjust as needed
+      .skip(skip)
+      .limit(Number(pageSize))
+      .sort({ createdAt: -1 });
 
-    // Get the total count of events (for pagination)
     const totalRecords = await Event.countDocuments(searchFilter);
 
-    // If user is authenticated, check if they are registered for each event
     if (req.user) {
       const userId = req.user.id;
-      // Get all events' registrations to check if the user is registered
-      const eventRegistrations = await Event.find({}, "registeredUsers");
 
-      // Create a Set of event IDs where the user is registered
-      const registeredEventIds = new Set(
-        eventRegistrations
-          .filter((event) =>
-            event.registeredUsers.some(
-              (user) => user.userId.toString() === userId
-            )
-          )
-          .map((event) => event._id.toString())
-      );
-      // Add isAlreadyRegistered to each event
+      // Attach `isAlreadyRegistered` and `paymentPending` for each event
       events.forEach((event) => {
-        event.isAlreadyRegistered = registeredEventIds.has(event._id.toString());
+        const registeredUser = event.registeredUsers.find(
+          (user) => user.userId.toString() === userId
+        );
+
+        if (registeredUser) {
+          event._doc.isAlreadyRegistered = true;
+          event._doc.paymentPending = registeredUser.paymentPending;
+        } else {
+          event._doc.isAlreadyRegistered = false;
+          event._doc.paymentPending = null; // or false if you prefer
+        }
+
+        // Optionally: remove registeredUsers from response
+        delete event._doc.registeredUsers;
+      });
+    } else {
+      // If user not authenticated, remove registeredUsers for public response
+      events.forEach((event) => {
+        delete event._doc.registeredUsers;
       });
     }
 
-    // Return the paginated events and the total record count
     res.status(200).json({
       events,
       totalRecords,
-      totalPages: Math.ceil(totalRecords / pageSize), // Calculate total pages
+      totalPages: Math.ceil(totalRecords / pageSize),
       currentPage: Number(page),
       pageSize: Number(pageSize),
     });
@@ -158,8 +155,11 @@ router.post("/:eventId/register", protect, async (req, res) => {
     }
 
     // Register the user
-    event.registeredUsers.push({ userId: user.id, gender: user.gender });
-    await event.save();
+    event.registeredUsers.push({
+      userId: user.id,
+      gender: user.gender,
+      paymentPending: event.price > 0 ? true : false,
+    });    await event.save();
 
     // Send confirmation email
     await sendRegistrationEmail(user, event);

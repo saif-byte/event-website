@@ -15,6 +15,8 @@ const eventSchema = new mongoose.Schema(
       {
         userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
         gender: { type: String, enum: ["MALE", "FEMALE", "OTHER"], required: true },
+        paymentPending: { type: Boolean, default: false }, // <-- Add this line
+
       },
     ],
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
