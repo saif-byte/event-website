@@ -151,11 +151,9 @@ router.post("/:eventId/register", protect, async (req, res) => {
     // Check if the event has already ended
     const currentDate = new Date();
     if (new Date(event.endDate) < currentDate) {
-      return res
-        .status(400)
-        .json({
-          message: "Event registration closed. The event has already ended.",
-        });
+      return res.status(400).json({
+        message: "Event registration closed. The event has already ended.",
+      });
     }
 
     // Check if user is already registered
@@ -195,15 +193,13 @@ router.post("/:eventId/register", protect, async (req, res) => {
     // Send confirmation email
     await sendRegistrationEmail(user, event);
 
-    res
-      .status(200)
-      .json({
-        message:
-          event.price > 0
-            ? "Your Registration will be confirmed after the payment"
-            : "Successfully registered for the event",
-        event,
-      });
+    res.status(200).json({
+      message:
+        event.price > 0
+          ? "Your Registration will be confirmed after the payment"
+          : "Successfully registered for the event",
+      event,
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
@@ -455,5 +451,48 @@ router.put(
     }
   }
 );
+// @route   POST /api/events/mark-payment
+// @desc    Mark paymentPending as false for a registered user
+// @access  Private/Admin (add auth middleware if needed)
+
+router.post("/mark-payment", protect, adminProtect, async (req, res) => {
+  const { eventId, userId } = req.body;
+
+  if (!eventId || !userId) {
+    return res.status(400).json({ message: "eventId and userId are required" });
+  }
+
+  try {
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    // Find the index of the registered user
+    const userIndex = event.registeredUsers.findIndex(
+      (u) => u.userId.toString() === userId
+    );
+
+    if (userIndex === -1) {
+      return res
+        .status(404)
+        .json({ message: "User not registered for this event" });
+    }
+
+    // Check if paymentPending is true and update it
+    if (event.registeredUsers[userIndex].paymentPending) {
+      event.registeredUsers[userIndex].paymentPending = false;
+      await event.save();
+      return res.status(200).json({ message: "Payment marked as complete." });
+    } else {
+      return res
+        .status(200)
+        .json({ message: "Payment was already completed." });
+    }
+  } catch (error) {
+    console.error("Error updating payment status:", error);
+    return res.status(500).json({ message: "Server error", error });
+  }
+});
 
 module.exports = router;

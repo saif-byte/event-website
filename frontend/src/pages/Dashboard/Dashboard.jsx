@@ -122,6 +122,7 @@ const Dashboard = () => {
               {selectedEvent ? (
                 <RegisteredUsers
                   registeredUsers={registeredUsers}
+                  eventId ={selectedEvent}
                   onBack={() => setSelectedEvent(null)}
                 />
               ) : (
