@@ -1,6 +1,8 @@
 import "./HikingEventCard.css";
 import dateRangeIcon from "../../assets/icons/date-range.svg";
 import priceIcon from "../../assets/icons/price.svg";
+import greenCircle from "../../assets/icons/green-circle.png";
+
 import { Typography, Button } from "@mui/material";
 
 
@@ -24,7 +26,7 @@ export default function HikingEventCard({ event, onRSVP, onUnrsvp }) {
                 <span>{event.price ?  "$" +event.price : "Free Event"}</span>
               </div>
             </div>
-
+            <div className="button-box">
             {/* Conditionally render the RSVP or Unrsvp button */}
             {event.isAlreadyRegistered ? (
               <button className="unrsvp-button"                              
@@ -32,10 +34,21 @@ export default function HikingEventCard({ event, onRSVP, onUnrsvp }) {
                 Unrsvp
               </button>
             ) : (
+              <>
               <button className="rsvp-button"  onClick={() => onRSVP(event)}>
                 RSVP Me
               </button>
+               <div className="seats-remaining-box">
+               <img src={greenCircle} alt="" className="active-circle" />
+               <div className="seats-remaining">
+  {event.remainingSeatsForUserGender === 0
+    ? "No seats remaining"
+    : `${event.remainingSeatsForUserGender}/${event.totalSeatsForGender} seats remaining`}
+</div>             </div> </>            
             )}
+           
+
+            </div>
           </div>
         </div>
       </div>

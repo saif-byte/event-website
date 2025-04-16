@@ -39,6 +39,7 @@ router.get("/", optionalProtect, async (req, res) => {
 
     if (req.user) {
       const userId = req.user.id;
+      const userGender = req.user.gender;
 
       // Attach `isAlreadyRegistered` and `paymentPending` for each event
       events.forEach((event) => {
@@ -53,7 +54,23 @@ router.get("/", optionalProtect, async (req, res) => {
           event._doc.isAlreadyRegistered = false;
           event._doc.paymentPending = null; // or false if you prefer
         }
+        // Count how many seats are already taken for the user's gender
+        const registeredCount = event.registeredUsers.filter(
+          (user) => user.gender === userGender
+        ).length;
 
+        let totalSeatsForGender = 0;
+        if (userGender === "MALE") totalSeatsForGender = event.maleSeats;
+        else if (userGender === "FEMALE")
+          totalSeatsForGender = event.femaleSeats;
+        else if (userGender === "OTHER")
+          totalSeatsForGender = Math.floor(
+            (event.maleSeats + event.femaleSeats) * 0.1
+          ); // Optional logic for "OTHER"
+
+        event._doc.remainingSeatsForUserGender =
+          totalSeatsForGender - registeredCount;
+        event._doc.totalSeatsForGender = totalSeatsForGender;
         // Optionally: remove registeredUsers from response
         delete event._doc.registeredUsers;
       });

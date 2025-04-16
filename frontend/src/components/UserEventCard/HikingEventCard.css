@@ -257,7 +257,25 @@
   border-radius: 5px;
   margin-top: 10px;
 }
+.button-box{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
+.active-circle{
+  width: 12px;
+  height: 12px;  
+}
+.seats-remaining-box{
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.seats-remaining{
+  font-size: small;
+  color: white;
+}
 /* Responsive adjustments */
 @media (max-width: 400px) {
   .event-card-user {
