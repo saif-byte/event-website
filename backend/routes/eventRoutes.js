@@ -55,21 +55,23 @@ router.get("/", optionalProtect, async (req, res) => {
           event._doc.paymentPending = null; // or false if you prefer
         }
         // Count how many seats are already taken for the user's gender
-        const registeredCount = event.registeredUsers.filter(
-          (user) => user.gender === userGender
-        ).length;
+        const registeredCount = event.registeredUsers.filter((user) => {
+          if (userGender === "OTHER") {
+            return user.gender === "MALE" || user.gender === "OTHER";
+          } else {
+            return user.gender === userGender;
+          }
+        }).length;
 
         let totalSeatsForGender = 0;
-        if (userGender === "MALE") totalSeatsForGender = event.maleSeats;
+        if (userGender === "MALE" || userGender === "OTHER")
+          totalSeatsForGender = event.maleSeats;
         else if (userGender === "FEMALE")
           totalSeatsForGender = event.femaleSeats;
-        else if (userGender === "OTHER")
-          totalSeatsForGender = Math.floor(
-            (event.maleSeats + event.femaleSeats) * 0.1
-          ); // Optional logic for "OTHER"
-
-        event._doc.remainingSeatsForUserGender =
-          totalSeatsForGender - registeredCount;
+        event._doc.remainingSeatsForUserGender = Math.max(
+          totalSeatsForGender - registeredCount,
+          0
+        );
         event._doc.totalSeatsForGender = totalSeatsForGender;
         // Optionally: remove registeredUsers from response
         delete event._doc.registeredUsers;
@@ -184,19 +186,20 @@ router.post("/:eventId/register", protect, async (req, res) => {
 
     // Check seat availability based on gender
     const maleCount = event.registeredUsers.filter(
-      (u) => u.gender === "MALE"
+      (u) => u.gender === "MALE" || u.gender === "OTHER"
     ).length;
     const femaleCount = event.registeredUsers.filter(
       (u) => u.gender === "FEMALE"
     ).length;
 
-    if (user.gender === "MALE" && maleCount >= event.maleSeats) {
-      return res.status(400).json({ message: "No more MALE seats available" });
+    if (
+      (user.gender === "MALE" || user.gender === "OTHER") &&
+      maleCount >= event.maleSeats
+    ) {
+      return res.status(400).json({ message: "No more seats available" });
     }
     if (user.gender === "FEMALE" && femaleCount >= event.femaleSeats) {
-      return res
-        .status(400)
-        .json({ message: "No more FEMALE seats available" });
+      return res.status(400).json({ message: "No more seats available" });
     }
 
     // Register the user

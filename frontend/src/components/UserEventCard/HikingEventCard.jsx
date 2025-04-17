@@ -2,6 +2,7 @@ import "./HikingEventCard.css";
 import dateRangeIcon from "../../assets/icons/date-range.svg";
 import priceIcon from "../../assets/icons/price.svg";
 import greenCircle from "../../assets/icons/green-circle.png";
+import peopleIcon from "../../assets/icons/people.svg"
 
 import { Typography, Button } from "@mui/material";
 
@@ -12,6 +13,13 @@ export default function HikingEventCard({ event, onRSVP, onUnrsvp }) {
       <div className="inner-event-card-container">
         <div className="event-card-user">
           <div className="event-content">
+          {event.remainingSeatsForUserGender === 0 ? (
+  <div className="soldout">Sold Out</div>
+) : (<div className="remaining-seats">
+  <img src={peopleIcon} alt="peopleicon" className="people-icon"/>
+  <span>{event.remainingSeatsForUserGender + " seats remaining"}</span>
+</div>
+)}
             <h2 className="event-title">{event.name}</h2>
             <p className="event-description">{event.description}</p>
 
@@ -34,17 +42,9 @@ export default function HikingEventCard({ event, onRSVP, onUnrsvp }) {
                 Unrsvp
               </button>
             ) : (
-              <>
               <button className="rsvp-button"  onClick={() => onRSVP(event)}>
                 RSVP Me
               </button>
-               <div className="seats-remaining-box">
-               <img src={greenCircle} alt="" className="active-circle" />
-               <div className="seats-remaining">
-  {event.remainingSeatsForUserGender === 0
-    ? "No seats remaining"
-    : `${event.remainingSeatsForUserGender}/${event.totalSeatsForGender} seats remaining`}
-</div>             </div> </>            
             )}
            
 

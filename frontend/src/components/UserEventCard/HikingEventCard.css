@@ -276,6 +276,29 @@
   font-size: small;
   color: white;
 }
+.soldout{
+  background: red;
+  color:white;
+  width: fit-content;
+    padding: 2px 12px;
+  font-weight:bold;
+  text-align: center;
+  font-size: 14px;
+
+}
+.people-icon{
+  height: 20px;
+}
+.remaining-seats{
+  display: flex;
+  align-items: center;
+  background-color: green;
+  gap:4px;
+  font-weight: bold ;
+  width: fit-content;
+  padding: 2px 12px;
+  font-size: 14px;
+}
 /* Responsive adjustments */
 @media (max-width: 400px) {
   .event-card-user {
