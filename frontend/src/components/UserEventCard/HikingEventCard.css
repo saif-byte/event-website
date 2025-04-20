@@ -203,13 +203,12 @@
 .event-description {
   font-size: 14px;
   line-height: 1.5;
-  max-height: 50px;
+  max-height: 80px;
   margin-bottom: 20px;
 }
 
 .event-details {
   display: flex;
-  flex-direction: column;
   gap: 8px;
   margin-bottom: 20px;
 }

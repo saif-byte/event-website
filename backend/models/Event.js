@@ -1,25 +1,33 @@
 const mongoose = require("mongoose");
-
 const eventSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     description: { type: String, required: true },
     startDate: { type: Date, required: true },
     endDate: { type: Date, required: true },
+    rsvpStartDate: { type: Date, required: true },
+    rsvpEndDate: { type: Date, required: true },
     location: { type: String, required: true },
     maleSeats: { type: Number, required: true },
     femaleSeats: { type: Number, required: true },
     price: { type: Number, required: true },
-    isAlreadyRegistered : {type : Boolean},
+    isAlreadyRegistered: { type: Boolean },
     registeredUsers: [
       {
         userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-        gender: { type: String, enum: ["MALE", "FEMALE", "OTHER"], required: true },
-        paymentPending: { type: Boolean, default: false }, // <-- Add this line
-
+        gender: {
+          type: String,
+          enum: ["MALE", "FEMALE", "OTHER"],
+          required: true,
+        },
+        paymentPending: { type: Boolean, default: false },
       },
     ],
-    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
   { timestamps: true }
 );

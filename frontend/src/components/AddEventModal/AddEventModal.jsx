@@ -13,6 +13,7 @@ import { apiCall } from "../../utils/api";
 const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
   const [eventData, setEventData] = useState({
     name: "",
+    rsvpStartDate: "",
     startDate: "",
     endDate: "",
     location: "",
@@ -25,18 +26,27 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
   const [errors, setErrors] = useState({});
   const [confirmOpen, setConfirmOpen] = useState(false);
 
+  const getMinDateTime = () => {
+    const now = new Date();
+    now.setSeconds(0, 0);
+    return now.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:mm"
+  };
+
+  const minDateTime = getMinDateTime();
+
   useEffect(() => {
     if (eventToEdit) {
-      // Ensure the dates are in the correct format (YYYY-MM-DD)
-      const formatDate = (date) => {
+      const formatDateTime = (date) => {
         const d = new Date(date);
-        return d.toISOString().split('T')[0]; // Extracts the date part (YYYY-MM-DD)
+        d.setSeconds(0, 0);
+        return d.toISOString().slice(0, 16);
       };
-  
+
       setEventData({
         name: eventToEdit.name,
-        startDate: formatDate(eventToEdit.startDate),
-        endDate: formatDate(eventToEdit.endDate),
+        rsvpStartDate: formatDateTime(eventToEdit.rsvpStartDate),
+        startDate: formatDateTime(eventToEdit.startDate),
+        endDate: formatDateTime(eventToEdit.endDate),
         location: eventToEdit.location,
         description: eventToEdit.description,
         maleSeats: eventToEdit.maleSeats,
@@ -44,9 +54,9 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
         price: eventToEdit.price,
       });
     } else {
-      // Reset the form data when adding a new event
       setEventData({
         name: "",
+        rsvpStartDate: "",
         startDate: "",
         endDate: "",
         location: "",
@@ -56,8 +66,8 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
         price: "",
       });
     }
-  }, [eventToEdit]); // Only trigger when eventToEdit changes
-  
+  }, [eventToEdit]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setEventData({ ...eventData, [name]: value });
@@ -68,6 +78,7 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
     let newErrors = {};
     const {
       name,
+      rsvpStartDate,
       startDate,
       endDate,
       location,
@@ -77,14 +88,25 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
       price,
     } = eventData;
 
-    if (!name) {
-      newErrors.name = "Event Name is required.";
+    const now = new Date();
+
+    if (!name) newErrors.name = "Event Name is required.";
+
+    if (!rsvpStartDate || new Date(rsvpStartDate) < now) {
+      newErrors.rsvpStartDate = "RSVP start must be in the future.";
     }
-    if (!startDate || !endDate || new Date(endDate) < new Date(startDate)) {
-      newErrors.endDate = "End Date cannot be earlier than Start Date.";
+
+    if (!startDate || new Date(startDate) < now) {
+      newErrors.startDate = "Start date/time must be in the future.";
     }
+
+    if (!endDate || new Date(endDate) < now || new Date(endDate) < new Date(startDate)) {
+      newErrors.endDate = "End date/time must be after start date/time and in the future.";
+    }
+
     if (!location) newErrors.location = "Location is required.";
     if (!description) newErrors.description = "Description is required.";
+
     if (!maleSeats || parseInt(maleSeats) < 0)
       newErrors.maleSeats = "Male Seats are required.";
     if (!femaleSeats || parseInt(femaleSeats) < 0)
@@ -104,10 +126,8 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
   const handleSubmit = async () => {
     try {
       if (eventToEdit) {
-        // Update event
         await apiCall(`/events/${eventToEdit._id}`, "PUT", eventData);
       } else {
-        // Add new event
         await apiCall("/events", "POST", eventData);
       }
       refreshEvents();
@@ -115,6 +135,7 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
       onClose();
       setEventData({
         name: "",
+        rsvpStartDate: "",
         startDate: "",
         endDate: "",
         location: "",
@@ -147,30 +168,41 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
           <TextField
             fullWidth
             margin="dense"
-            label="Start Date"
-            name="startDate"
-            type="date"
-            value={eventData.startDate}
+            label="RSVP Start Date"
+            name="rsvpStartDate"
+            type="datetime-local"
+            value={eventData.rsvpStartDate}
             onChange={handleChange}
-            error={!!errors.startDate}
-            helperText={errors.startDate}
-            InputLabelProps={{
-              shrink: true,
-            }}
+            error={!!errors.rsvpStartDate}
+            helperText={errors.rsvpStartDate}
+            InputLabelProps={{ shrink: true }}
+            inputProps={{ min: minDateTime }}
           />
           <TextField
             fullWidth
             margin="dense"
-            label="End Date"
+            label="Start Date & Time"
+            name="startDate"
+            type="datetime-local"
+            value={eventData.startDate}
+            onChange={handleChange}
+            error={!!errors.startDate}
+            helperText={errors.startDate}
+            InputLabelProps={{ shrink: true }}
+            inputProps={{ min: minDateTime }}
+          />
+          <TextField
+            fullWidth
+            margin="dense"
+            label="End Date & Time"
             name="endDate"
-            type="date"
+            type="datetime-local"
             value={eventData.endDate}
             onChange={handleChange}
             error={!!errors.endDate}
             helperText={errors.endDate}
-            InputLabelProps={{
-              shrink: true,
-            }}
+            InputLabelProps={{ shrink: true }}
+            inputProps={{ min: minDateTime }}
           />
           <TextField
             fullWidth
@@ -236,7 +268,6 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
         </DialogActions>
       </Dialog>
 
-      {/* Confirmation Dialog */}
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
         <DialogTitle>
           Confirm Event {eventToEdit ? "Update" : "Creation"}

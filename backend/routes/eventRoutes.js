@@ -33,7 +33,7 @@ router.get("/", optionalProtect, async (req, res) => {
     const events = await Event.find(searchFilter)
       .skip(skip)
       .limit(Number(pageSize))
-      .sort({ createdAt: -1 });
+      .sort({ startDate: 1 });
 
     const totalRecords = await Event.countDocuments(searchFilter);
 
@@ -112,6 +112,7 @@ router.post(
       check("startDate", "Start date is required").isISO8601(),
       check("endDate", "End date is required").isISO8601(),
       check("location", "Location is required").not().isEmpty(),
+      check("rsvpStartDate", "RSVP start date is required").isISO8601(),
       check("maleSeats", "Number of male seats is required").isInt({ min: 0 }),
       check("femaleSeats", "Number of female seats is required").isInt({
         min: 0,
@@ -122,17 +123,31 @@ router.post(
     const errors = validationResult(req);
     if (!errors.isEmpty())
       return res.status(400).json({ errors: errors.array() });
-
     const {
       name,
       description,
       startDate,
       endDate,
+      rsvpStartDate,
       location,
       maleSeats,
       femaleSeats,
       price,
     } = req.body;
+
+    const event = new Event({
+      name,
+      description,
+      startDate,
+      endDate,
+      rsvpStartDate,
+      rsvpEndDate: startDate, // auto-assign RSVP end date to event start date
+      location,
+      maleSeats,
+      femaleSeats,
+      price,
+      createdBy: req.user.id,
+    });
 
     try {
       const event = new Event({
@@ -140,13 +155,14 @@ router.post(
         description,
         startDate,
         endDate,
+        rsvpStartDate,
+        rsvpEndDate: startDate, // auto-assign RSVP end date to event start date
         location,
         maleSeats,
         femaleSeats,
         price,
         createdBy: req.user.id,
       });
-
       await event.save();
       res.status(201).json({ message: "Event created successfully", event });
     } catch (error) {
@@ -154,21 +170,34 @@ router.post(
     }
   }
 );
-
 // @route   POST /api/events/:eventId/register
 // @desc    Register a user for an event (Users Only)
 // @access  Private
 router.post("/:eventId/register", protect, async (req, res) => {
   try {
     const { eventId } = req.params;
-    const user = req.user; // User details from the middleware
+    const user = req.user; // User details from middleware
 
     // Find the event
     const event = await Event.findById(eventId);
     if (!event) return res.status(404).json({ message: "Event not found" });
 
-    // Check if the event has already ended
     const currentDate = new Date();
+
+    // RSVP period validation
+    if (event.rsvpStartDate && currentDate < new Date(event.rsvpStartDate)) {
+      return res
+        .status(400)
+        .json({ message: "Registration has not started yet." });
+    }
+
+    if (event.rsvpEndDate && currentDate > new Date(event.rsvpEndDate)) {
+      return res
+        .status(400)
+        .json({ message: "RSVP period has ended. Registration closed." });
+    }
+
+    // Check if the event has already ended
     if (new Date(event.endDate) < currentDate) {
       return res.status(400).json({
         message: "Event registration closed. The event has already ended.",
@@ -216,107 +245,15 @@ router.post("/:eventId/register", protect, async (req, res) => {
     res.status(200).json({
       message:
         event.price > 0
-          ? "Your Registration will be confirmed after the payment"
+          ? "Your registration will be confirmed after the payment"
           : "Successfully registered for the event",
       event,
     });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Server error", error });
   }
 });
-const sendRegistrationEmail = async (user, event) => {
-  try {
-    const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
-
-    const isPaidEvent = event.price > 0;
-
-    const paidEventEmail = `
-      <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Payment Pending</title>
-</head>
-<body style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 0; margin: 0;">
-  <div style="max-width: 600px; margin: auto; background: #fff; padding: 30px; border-radius: 10px;">
-    <h2 style="color: #222;">Hi ${user.name},</h2>
-    <p style="font-size: 16px; color: #444;">
-      Thank you for registering for <strong>${event.name}</strong>!
-    </p>
-    <p style="font-size: 16px; color: #444;">
-      Your registration has been received. However, since this is a paid event, your spot will only be confirmed after we receive the payment of <strong>$${
-        event.price
-      }</strong>.
-    </p>
-    <p style="font-size: 16px; color: #444;">
-      Event Date: <strong>${new Date(
-        event.startDate
-      ).toLocaleDateString()}</strong><br />
-      Location: <strong>${event.location}</strong>
-    </p>
-    <p style="font-size: 16px; color: #444;">
-      Please complete the payment at your earliest convenience to secure your seat.
-    </p>
-    <p style="font-size: 16px; color: #444;">Best regards,<br/>The Event Team</p>
-    <div style="margin-top: 30px; font-size: 12px; color: #888; text-align: center;">
-      <p>&copy; 2025 Event Website. All rights reserved.</p>
-    </div>
-  </div>
-</body>
-</html>
-    `;
-
-    const freeEventEmail = `
-      <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Registration Confirmed</title>
-</head>
-<body style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 0; margin: 0;">
-  <div style="max-width: 600px; margin: auto; background: #fff; padding: 30px; border-radius: 10px;">
-    <h2 style="color: #222;">Welcome, ${user.name}!</h2>
-    <p style="font-size: 16px; color: #444;">
-      You’re all set for <strong>${event.name}</strong>!
-    </p>
-    <p style="font-size: 16px; color: #444;">
-      We’re excited to have you join us. Here are the details:
-    </p>
-    <ul style="font-size: 16px; color: #444;">
-      <li><strong>Date:</strong> ${new Date(
-        event.startDate
-      ).toLocaleDateString()}</li>
-      <li><strong>Location:</strong> ${event.location}</li>
-    </ul>
-    <p style="font-size: 16px; color: #444;">
-      Get ready for an amazing experience!
-    </p>
-    <p style="font-size: 16px; color: #444;">Cheers,<br/>The Event Team</p>
-    <div style="margin-top: 30px; font-size: 12px; color: #888; text-align: center;">
-      <p>&copy; 2025 Event Website. All rights reserved.</p>
-    </div>
-  </div>
-</body>
-</html>
-    `;
-
-    const sendSmtpEmail = {
-      to: [{ email: user.email, name: user.name }],
-      sender: { email: process.env.SENDER_EMAIL, name: "Event Team" },
-      subject: isPaidEvent
-        ? `Complete Your Payment for ${event.name}`
-        : `You're Registered for ${event.name}!`,
-      htmlContent: isPaidEvent ? paidEventEmail : freeEventEmail,
-    };
-
-    await apiInstance.sendTransacEmail(sendSmtpEmail);
-    console.log("Registration email sent via Brevo!");
-  } catch (error) {
-    console.error("Error sending email with Brevo:", error);
-  }
-};
 
 // @route   DELETE /api/events/:eventId/unregister
 // @desc    Unregister a user from an event

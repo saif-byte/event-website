@@ -10,6 +10,7 @@ import ResponseModal from "../../components/ResponseModal/ResponseModal";
 import ConfirmUnrsvpModal from "../../components/ConfirmUnrsvpModal/ConfirmUnrsvpModal";
 import LoginRequiredModal from "../../components/LoginRequiredModal/LoginRequiredModal";
 import Pagination from "../../components/Pagination/Pagination"
+
 const Home = () => {
   const navigate = useNavigate();
   const [events, setEvents] = useState([]);
@@ -51,17 +52,16 @@ const Home = () => {
     fetchEvents();
   }, [currentPage, pageSize, searchTerm]); // Re-fetch when pagination or search term changes
 
-  // Function to handle RSVP button click
   const handleRSVPClick = (event) => {
     const token = localStorage.getItem("token");
     if (!token) {
       setSelectedEvent(event);
-      setActiveModal('login'); // Show login required modal if user is not logged in
+      setActiveModal("login");
     } else {
-      setSelectedEvent(event);
-      setActiveModal('rsvp'); // Open RSVP modal if user is logged in
+      navigate(`/events/${event._id}/rsvp`, { state: { event } });
     }
   };
+  
 
   // Handle RSVP Confirmation API Call
   const handleRSVPConfirm = async () => {
