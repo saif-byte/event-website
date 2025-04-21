@@ -451,5 +451,49 @@ router.post("/mark-payment", protect, adminProtect, async (req, res) => {
     return res.status(500).json({ message: "Server error", error });
   }
 });
+// Helper function to send registration confirmation email
+const sendRegistrationEmail = async (user, event) => {
+  try {
+    const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+
+    const sendSmtpEmail = {
+      to: [{ email: user.email, name: user.name }],
+      sender: { email: process.env.SENDER_EMAIL, name: "Event Team" },
+      subject: `Successfully Registered for ${event.name}`,
+      htmlContent: `
+       <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Registration Confirmation</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
+  <div style="width: 100%; max-width: 600px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);">
+    <h1 style="color: #333;">Registration Successful!</h1>
+    <p style="font-size: 16px; color: #555;">Dear ${user.name},</p>
+    <p style="font-size: 16px; color: #555;">Congratulations! You have successfully registered for the event <strong>${
+      event.name
+    }</strong>.</p>
+    <p style="font-size: 16px; color: #555;">The event will take place on <strong>${new Date(
+      event.startDate
+    ).toLocaleDateString()}</strong> at <strong>${event.location}</strong>.</p>
+    <p style="font-size: 16px; color: #555;">We are excited to see you there!</p>
+    <p style="font-size: 16px; color: #555;">Best regards, <br/> The Event Team</p>
+    <div style="margin-top: 20px; font-size: 12px; color: #777; text-align: center;">
+      <p>&copy; 2025 Event Website. All Rights Reserved.</p>
+    </div>
+  </div>
+</body>
+</html>
+      `,
+    };
+
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log("Registration email sent via Brevo!");
+  } catch (error) {
+    console.error("Error sending email with Brevo:", error);
+  }
+};
 
 module.exports = router;

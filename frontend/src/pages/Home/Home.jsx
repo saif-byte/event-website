@@ -58,7 +58,7 @@ const Home = () => {
       setSelectedEvent(event);
       setActiveModal("login");
     } else {
-      navigate(`/events/${event._id}/rsvp`, { state: { event } });
+      navigate(`/events/rsvp`, { state: { event } });
     }
   };
   

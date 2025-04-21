@@ -256,7 +256,7 @@
   border-radius: 5px;
   margin-top: 10px;
 }
-.button-box{
+.button-box-card{
   display: flex;
   justify-content: space-between;
   align-items: center;

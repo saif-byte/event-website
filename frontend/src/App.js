@@ -63,7 +63,7 @@ function App() {
 
           {/* Routes available only to authenticated users */}
           <Route
-            path="/events/:id/rsvp"
+            path="/events/rsvp"
             element={
               <PrivateRoute>
                 <EventDetailPage />

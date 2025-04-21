@@ -1,15 +1,42 @@
-import React from "react";
+import React , { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import './EventDetail.css';
 import mainImage from "../../assets/images/home.svg";
 import infoIcon from "../../assets/icons/info.svg";
-
+import { apiCall } from "../../utils/api";
+import RSVPModal from "../../components/RSVPModal/RSVPModal";
+import ResponseModal from "../../components/ResponseModal/ResponseModal";
 import Header from "../Header/Header";
 
 const EventDetailPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const event = location.state?.event;
+  const [isRSVPModalOpen, setIsRSVPModalOpen] = useState(false);
+  const [responseMessage, setResponseMessage] = useState("");
+const [isResponseModalOpen, setIsResponseModalOpen] = useState(false);
+
+const handleRSVPConfirm = async () => {
+    try {
+      const response = await apiCall(`/events/${event._id}/register`, "POST");
+      setResponseMessage(response.message);
+      setIsResponseModalOpen(true);
+    } catch (error) {
+      setResponseMessage(error.message);
+      setIsResponseModalOpen(true);
+    } finally {
+      setIsRSVPModalOpen(false);
+    }
+  };
+  
+  const handleCloseResponseModal = () => {
+    setIsResponseModalOpen(false);
+  };
+  
+  const handleCloseModal = () => {
+    setIsRSVPModalOpen(false)
+  }
+  
 
   if (!event) {
     return (
@@ -40,7 +67,10 @@ const EventDetailPage = () => {
             <p className="event-price">
               <strong>Price:</strong> {event?.price ? ( "$" + event.price) : "Free Event"}
             </p>
+            <div className="description-box">
+            <h3>Event Details</h3>
             <p>{event.description}</p>
+            </div>
           </div>
 
           {event.price > 0 && (
@@ -68,7 +98,29 @@ const EventDetailPage = () => {
 
           {/* Add RSVP button here if needed */}
         </div>
+        <div className="button-box">
+         
+        <button  className="confirm-button-rsvp"   onClick={() => setIsRSVPModalOpen(true)}
+        >
+            RSVP Me
+          </button>
+        </div>
       </div>
+      {isRSVPModalOpen && (
+  <RSVPModal 
+    event={event} 
+    onConfirm={handleRSVPConfirm} 
+    onClose={handleCloseModal} 
+  />
+  
+)}
+{isResponseModalOpen && (
+  <ResponseModal
+    message={responseMessage}
+    onClose={handleCloseResponseModal}
+  />
+)}
+
     </>
   );
 };

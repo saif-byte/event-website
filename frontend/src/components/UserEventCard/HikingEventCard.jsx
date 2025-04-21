@@ -34,7 +34,7 @@ export default function HikingEventCard({ event, onRSVP, onUnrsvp }) {
                 <span>{event.price ?  "$" +event.price : "Free Event"}</span>
               </div>
             </div>
-            <div className="button-box">
+            <div className="button-box-card">
             {/* Conditionally render the RSVP or Unrsvp button */}
             {event.isAlreadyRegistered ? (
               <button className="unrsvp-button"                              
