@@ -77,6 +77,8 @@
   border-radius: 12px;
   background: var(--accent);
   min-width: 400px;
+  height: 350px;
+  min-height: 350px;
 }
 .inner-event-card-container {
   clip-path: polygon(
@@ -157,7 +159,12 @@
 
   border-radius: 12px;
   background: rgb(69, 69, 6);
+  height: 350px;
+  min-height: 350px;
   scale: 0.93;
+}
+.event-content-box{
+  min-height: 200px;
 }
 .event-card-user {
   width: 100%;
@@ -203,8 +210,9 @@
 .event-description {
   font-size: 14px;
   line-height: 1.5;
-  max-height: 80px;
+  height: 75px;
   margin-bottom: 20px;
+  min-height: 50px;
 }
 
 .event-details {
@@ -287,6 +295,17 @@
 .people-icon{
   height: 20px;
 }
+.see-more-link {
+  color: var(--accent);
+  font-weight: 500;
+  cursor: pointer;
+  margin-left: 6px;
+}
+
+.see-more-link:hover {
+  text-decoration: underline;
+}
+
 .remaining-seats{
   display: flex;
   align-items: center;

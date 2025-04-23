@@ -22,8 +22,22 @@ export default function HikingEventCard({ event, onRSVP, onUnrsvp }) {
       <span>{event.remainingSeatsForUserGender + " seats remaining"}</span>
     </div>
   )
-) : null}          <h2 className="event-title">{event.name}</h2>
-            <p className="event-description">{event.description}</p>
+) : null}          
+<div className="event-content-box">
+<h2 className="event-title">{event.name}</h2>
+<p className="event-description">
+  {event.description.length > 100 ? (
+    <>
+      {event.description.slice(0, 100)}...
+      <span
+        className="see-more-link"
+        onClick={() => onRSVP(event)}
+      >
+        See More
+      </span>
+    </>
+  ) : event.description}
+</p>
 
             <div className="event-details">
               <div className="event-date">
@@ -35,6 +49,7 @@ export default function HikingEventCard({ event, onRSVP, onUnrsvp }) {
                 <img src={priceIcon} className="price-icon"></img>
                 <span>{event.price ?  "$" +event.price : "Free Event"}</span>
               </div>
+            </div>
             </div>
             <div className="button-box-card">
   {/* Conditionally render the RSVP or Unrsvp button */}

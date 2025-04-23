@@ -2,7 +2,6 @@
 .dashboard-layout {
   display: flex;
   height: 100vh;
-  background: #f5f7fa;
 }
 
 /* ============ Sidebar ============ */
@@ -14,7 +13,7 @@
   flex-direction: column;
   padding-top: 20px;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-  height: 100%;
+  height: auto;
   transition: width 0.3s ease-in-out;
 }
 
@@ -68,7 +67,6 @@
   flex-grow: 1;
   padding: 30px;
   overflow-y: auto;
-  background: #f5f7fa;
 }
 
 /* Title Styling */
@@ -80,6 +78,28 @@
   padding-bottom: 16px;
   border-bottom: 1px solid #e9ecef;
 }
+.event-card {
+  width: 350px;        /* Set a fixed width */
+  height: 300px;       /* Set a fixed height */
+  overflow: hidden;    /* Hide overflow if content exceeds */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+.see-more-link-admin {
+  color: var(--primary);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.see-more-link-admin:hover {
+  text-decoration: underline;
+}
+
 
 /* ============ Responsive Sidebar ============ */
 @media (max-width: 768px) {
@@ -109,15 +129,14 @@
   .dashboard-content {
     padding: 20px;
   }
-}
-.event-card {
-  height: 220px;
-  max-height: 300px;
-  overflow: auto;
+  .event-card {
+    height: fit-content;
+    width: 250px;
+    overflow: auto;
+  }
 }
 .event-description {
   max-width: 350px;
-  width: 250px;
   overflow-y: auto;
 }
 

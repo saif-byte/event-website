@@ -10,6 +10,7 @@ import SignupPage from "./pages/Signup/Signup";
 import Home from "./pages/Home/Home";
 import FAQ from "./pages/FAQ/Faq";
 import EventDetailPage from "./pages/EventDetail/EventDetail";
+import AdminEventDetailPage from "./pages/AdminEventDetail/AdminEventDetail";
 import Login from "./pages/Login/Login";
 import { ToastContainer } from "react-toastify";
 import Contact from "./pages/Contact/Contact";
@@ -82,6 +83,14 @@ function App() {
             element={
               <AdminRoute>
                 <Dashboard />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/events/:eventId"
+            element={
+              <AdminRoute>
+                <AdminEventDetailPage />{" "}
               </AdminRoute>
             }
           />

@@ -32,26 +32,24 @@ const RegisteredUsers = ({ registeredUsers, eventId, onBack, refreshEvent }) => 
 
   const handleMarkAsPaid = async () => {
     try {
-      await apiCall("/events/mark-payment", "POST", {
+      const res = await apiCall("/events/mark-payment", "POST", {
         eventId,
         userId: selectedUserId,
       });
-      toast.success("Payment marked as done.");
+      toast.success(res.message);
       handleMenuClose();
       if (refreshEvent) refreshEvent();
       let user = registeredUsers.find((user) => user.userId._id == selectedUserId)
       user.paymentPending = false
     } catch (err) {
-      toast.error("Failed to mark payment.");
+      toast.error(err?.message || "Failed to mark payment.");
       handleMenuClose();
     }
   };
 
   return (
     <div className="registered-users">
-      <Button variant="outlined" onClick={onBack} style={{ marginBottom: "10px" }}>
-        ← Back to Events
-      </Button>
+      
       <Typography variant="h5" gutterBottom>
         Registered Users
       </Typography>

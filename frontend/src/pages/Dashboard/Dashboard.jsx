@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Typography, Button } from "@mui/material";
 import { apiCall } from "../../utils/api";
+import { useNavigate } from "react-router-dom";
+
 import EventList from "../EventList";
 import RegisteredUsers from "../RegisteredUsers";
 import ContactUsers from "../ContactUsers";
+import AdminLayout from "../../layouts/AdminLayout";
 
-import Sidebar from "../../components/Sidebar/Sidebar";
 import AddEventModal from "../../components/AddEventModal/AddEventModal";
 import "./Dashboard.css";
 import Header from "../Header/Header";
@@ -26,7 +28,12 @@ const Dashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(6);
   const [totalRecords, setTotalRecords] = useState(0);
+  const navigate = useNavigate();
 
+  const handleViewDetails = (event) => {
+    debugger
+    navigate(`/events/${event._id}`, { state: { event } });
+  };
   useEffect(() => {
     if (activeTab === "events") {
       fetchEvents();
@@ -97,14 +104,10 @@ const Dashboard = () => {
 
   return (
     <>
-      <Header />
-      <div className="dashboard-layout">
-        <Sidebar 
-          onSelectTab={setActiveTab} 
-          activeTab={activeTab} 
-          tabs={["events", "contacts", "users"]}
-        />
+        <AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
 
+      <div className="dashboard-layout">
+      
         <div className="dashboard-content">
          
 
@@ -127,13 +130,14 @@ const Dashboard = () => {
                 />
               ) : (
                 <EventList
-                  events={events}
-                  loading={loading}
-                  error={error}
-                  onDeleteEvent={handleDeleteEvent}
-                  onSelectEvent={fetchRegisteredUsers}
-                  onEditEvent={handleEditEvent}
-                />
+                events={events}
+                loading={loading}
+                error={error}
+                onDeleteEvent={handleDeleteEvent}
+                onViewDetails={handleViewDetails}
+                onEditEvent={handleEditEvent}
+              />
+              
               )}
 
               <Pagination 
@@ -163,6 +167,7 @@ const Dashboard = () => {
         refreshEvents={fetchEvents}
         eventToEdit={eventToEdit}
       />
+      </AdminLayout>
     </>
   );
 };
