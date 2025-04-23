@@ -13,14 +13,16 @@ export default function HikingEventCard({ event, onRSVP, onUnrsvp }) {
       <div className="inner-event-card-container">
         <div className="event-card-user">
           <div className="event-content">
-          {event.remainingSeatsForUserGender === 0 ? (
-  <div className="soldout">Sold Out</div>
-) : (<div className="remaining-seats">
-  <img src={peopleIcon} alt="peopleicon" className="people-icon"/>
-  <span>{event.remainingSeatsForUserGender + " seats remaining"}</span>
-</div>
-)}
-            <h2 className="event-title">{event.name}</h2>
+          {typeof event.remainingSeatsForUserGender === "number" ? (
+  event.remainingSeatsForUserGender === 0 ? (
+    <div className="soldout">Sold Out</div>
+  ) : (
+    <div className="remaining-seats">
+      <img src={peopleIcon} alt="peopleicon" className="people-icon" />
+      <span>{event.remainingSeatsForUserGender + " seats remaining"}</span>
+    </div>
+  )
+) : null}          <h2 className="event-title">{event.name}</h2>
             <p className="event-description">{event.description}</p>
 
             <div className="event-details">
@@ -35,20 +37,26 @@ export default function HikingEventCard({ event, onRSVP, onUnrsvp }) {
               </div>
             </div>
             <div className="button-box-card">
-            {/* Conditionally render the RSVP or Unrsvp button */}
-            {event.isAlreadyRegistered ? (
-              <button className="unrsvp-button"                              
-              onClick={() => onUnrsvp(event)}>
-                Unrsvp
-              </button>
-            ) : (
-              <button className="rsvp-button"  onClick={() => onRSVP(event)}>
-                RSVP Me
-              </button>
-            )}
-           
+  {/* Conditionally render the RSVP or Unrsvp button */}
+  {event.isAlreadyRegistered ? (
+    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+      <button
+        className="unrsvp-button"
+        onClick={() => onUnrsvp(event)}
+      >
+        Unrsvp
+      </button>
 
-            </div>
+      {event.paymentPending && (
+        <span className="payment-pending-chip">Payment Pending</span>
+      )}
+    </div>
+  ) : (
+    <button className="rsvp-button" onClick={() => onRSVP(event)}>
+      RSVP Me
+    </button>
+  )}
+</div>
           </div>
         </div>
       </div>

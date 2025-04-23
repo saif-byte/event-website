@@ -9,8 +9,8 @@ export default function RSVPModal({ event,onConfirm ,  onClose }) {
       <div className="above-modal-content-rsvp">
       <div className="modal-content-rsvp">
         <h3>Thank you for your interest.</h3>
-        <p>The event details have been emailed to you.</p>
-
+        <p>We are excited to welcome you for this event</p>
+        <h4>Are you sure you want to register for the event</h4>
         {/* <div className="event-info">
           <p><strong>{event.name}</strong></p>
           <p className="event-description-rsvp">{event.description}</p>

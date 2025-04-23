@@ -54,6 +54,7 @@ const Home = () => {
 
   const handleRSVPClick = (event) => {
     const token = localStorage.getItem("token");
+    debugger
     if (!token) {
       setSelectedEvent(event);
       setActiveModal("login");

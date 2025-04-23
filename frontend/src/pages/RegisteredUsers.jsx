@@ -39,6 +39,8 @@ const RegisteredUsers = ({ registeredUsers, eventId, onBack, refreshEvent }) => 
       toast.success("Payment marked as done.");
       handleMenuClose();
       if (refreshEvent) refreshEvent();
+      let user = registeredUsers.find((user) => user.userId._id == selectedUserId)
+      user.paymentPending = false
     } catch (err) {
       toast.error("Failed to mark payment.");
       handleMenuClose();

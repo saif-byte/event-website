@@ -7,6 +7,8 @@ import { apiCall } from "../../utils/api";
 import RSVPModal from "../../components/RSVPModal/RSVPModal";
 import ResponseModal from "../../components/ResponseModal/ResponseModal";
 import Header from "../Header/Header";
+import { toast } from "react-toastify";
+
 
 const EventDetailPage = () => {
   const location = useLocation();
@@ -21,6 +23,13 @@ const handleRSVPConfirm = async () => {
       const response = await apiCall(`/events/${event._id}/register`, "POST");
       setResponseMessage(response.message);
       setIsResponseModalOpen(true);
+      navigate(`/home`);
+       toast.success("Successfully Registered for the event", {
+              position: "top-center", // You can change this based on your preference
+              autoClose: 5000, // Time in ms before the toast disappears
+              hideProgressBar: false, // Hide the progress bar
+            });
+           
     } catch (error) {
       setResponseMessage(error.message);
       setIsResponseModalOpen(true);
@@ -98,8 +107,7 @@ const handleRSVPConfirm = async () => {
 
           {/* Add RSVP button here if needed */}
         </div>
-        <div className="button-box">
-         
+        <div className="button-box">     
         <button  className="confirm-button-rsvp"   onClick={() => setIsRSVPModalOpen(true)}
         >
             RSVP Me
