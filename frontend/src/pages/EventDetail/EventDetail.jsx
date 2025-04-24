@@ -8,6 +8,7 @@ import RSVPModal from "../../components/RSVPModal/RSVPModal";
 import ResponseModal from "../../components/ResponseModal/ResponseModal";
 import Header from "../Header/Header";
 import { toast } from "react-toastify";
+import ConfirmUnrsvpModal from "../../components/ConfirmUnrsvpModal/ConfirmUnrsvpModal";
 
 
 const EventDetailPage = () => {
@@ -17,18 +18,32 @@ const EventDetailPage = () => {
   const [isRSVPModalOpen, setIsRSVPModalOpen] = useState(false);
   const [responseMessage, setResponseMessage] = useState("");
 const [isResponseModalOpen, setIsResponseModalOpen] = useState(false);
+const [isUnrsvpModalOpen, setIsUnrsvpModalOpen] = useState(false);
+
+const handleUnrsvpConfirm = async () => {
+  try {
+    const response = await apiCall(`/events/${event._id}/unregister`, "DELETE");
+    setResponseMessage(response.message);
+    setIsResponseModalOpen(true);
+    navigate(`/home`);
+    toast.success("Successfully Unregistered from the event", {
+      position: "top-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+    });
+  } catch (error) {
+    setResponseMessage(error.message);
+    setIsResponseModalOpen(true);
+  } finally {
+    setIsUnrsvpModalOpen(false);
+  }
+};
 
 const handleRSVPConfirm = async () => {
     try {
       const response = await apiCall(`/events/${event._id}/register`, "POST");
       setResponseMessage(response.message);
       setIsResponseModalOpen(true);
-      navigate(`/home`);
-       toast.success("Successfully Registered for the event", {
-              position: "top-center", // You can change this based on your preference
-              autoClose: 5000, // Time in ms before the toast disappears
-              hideProgressBar: false, // Hide the progress bar
-            });
            
     } catch (error) {
       setResponseMessage(error.message);
@@ -37,7 +52,10 @@ const handleRSVPConfirm = async () => {
       setIsRSVPModalOpen(false);
     }
   };
-  
+  const handleUnrsvpClick = () => {
+    setIsUnrsvpModalOpen(true);
+  };
+    
   const handleCloseResponseModal = () => {
     setIsResponseModalOpen(false);
   };
@@ -71,7 +89,10 @@ const handleRSVPConfirm = async () => {
               <strong>Location:</strong> {event.location}
             </p>
             <p className="event-date">
-              <strong>Date:</strong> {new Date(event.date).toLocaleString()}
+              <strong>Start Date:</strong> {new Date(event.startDate).toLocaleString()}
+            </p>
+            <p className="event-date">
+              <strong>End Date:</strong> {new Date(event.endDate).toLocaleString()}
             </p>
             <p className="event-price">
               <strong>Price:</strong> {event?.price ? ( "$" + event.price) : "Free Event"}
@@ -107,12 +128,24 @@ const handleRSVPConfirm = async () => {
 
           {/* Add RSVP button here if needed */}
         </div>
-        <div className="button-box">     
-        <button  className="confirm-button-rsvp"   onClick={() => setIsRSVPModalOpen(true)}
-        >
-            RSVP Me
-          </button>
-        </div>
+        <div className="button-box">
+  {event.isAlreadyRegistered ? (
+    <button
+      className="confirm-button-rsvp"
+      onClick={handleUnrsvpClick}
+    >
+      UnRSVP
+    </button>
+  ) : (
+    <button
+      className="confirm-button-rsvp"
+      onClick={() => setIsRSVPModalOpen(true)}        // Call the RSVP handler
+    >
+      RSVP Me
+    </button>
+  )}
+</div>
+
       </div>
       {isRSVPModalOpen && (
   <RSVPModal 
@@ -122,6 +155,14 @@ const handleRSVPConfirm = async () => {
   />
   
 )}
+{isUnrsvpModalOpen && (
+  <ConfirmUnrsvpModal
+    event={event}
+    onConfirm={handleUnrsvpConfirm}
+    onClose={() => setIsUnrsvpModalOpen(false)}
+  />
+)}
+
 {isResponseModalOpen && (
   <ResponseModal
     message={responseMessage}

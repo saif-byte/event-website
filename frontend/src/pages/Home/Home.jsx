@@ -27,7 +27,7 @@ const Home = () => {
   
   // Search state
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [eventStatus , setEventStatus] = useState("UPCOMING")
   // Single state to control which modal is active
   const [activeModal, setActiveModal] = useState(null); // 'rsvp', 'unrsvp', 'response', 'login', or null
 
@@ -35,7 +35,7 @@ const Home = () => {
   const fetchEvents = async () => {
     try {
       const response = await apiCall(
-        `/events?page=${currentPage}&pageSize=${pageSize}&search=${searchTerm}`,
+        `/events?page=${currentPage}&pageSize=${pageSize}&search=${searchTerm}&eventStatus=${eventStatus}`,
         "GET"
       );
       
@@ -50,7 +50,7 @@ const Home = () => {
 
   useEffect(() => {
     fetchEvents();
-  }, [currentPage, pageSize, searchTerm]); // Re-fetch when pagination or search term changes
+  }, [currentPage, pageSize, searchTerm, eventStatus]); // Re-fetch when pagination or search term changes
 
   const handleRSVPClick = (event) => {
     const token = localStorage.getItem("token");
@@ -115,6 +115,11 @@ const Home = () => {
     }
   };
 
+  const handleFilterClick = (filterName) => {
+    setEventStatus(filterName);
+    setCurrentPage(1);
+  }
+
   // Calculate the total pages based on total records and page size
   const totalPages = Math.ceil(totalRecords / pageSize);
 
@@ -133,7 +138,12 @@ const Home = () => {
             onChange={handleSearchChange} // Update search term
           />
         </div>
-
+        <div className="filter-buttons">
+          <button     className={`upcoming-button ${eventStatus === "UPCOMING" ? "active" : ""}`}
+ onClick={() => handleFilterClick("UPCOMING")} >UPCOMING</button>
+          <button      className={`past-button ${eventStatus === "PAST" ? "active" : ""}`}
+ onClick={() => handleFilterClick("PAST")}>PAST</button>
+        </div>
         {loading ? (
           <p>Loading events...</p>
         ) : error ? (

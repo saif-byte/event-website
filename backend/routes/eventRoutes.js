@@ -23,19 +23,40 @@ apiKey.apiKey = process.env.BREVO_API_KEY; // Store API
 // @access  Public (with optional authentication)
 router.get("/", optionalProtect, async (req, res) => {
   try {
-    const { page = 1, pageSize = 10, search = "" } = req.query;
+    const {
+      page = 1,
+      pageSize = 10,
+      search = "",
+      eventStatus = "UPCOMING",
+    } = req.query;
     const skip = (page - 1) * pageSize;
-
+    const now = new Date();
     const searchFilter = search
       ? { name: { $regex: search, $options: "i" } }
       : {};
-
-    const events = await Event.find(searchFilter)
+    // Adjust the filter based on eventStatus
+    let dateFilter;
+    if (eventStatus === "UPCOMING") {
+      dateFilter = { startDate: { $gte: now } }; // Future events only
+    } else if (eventStatus === "PAST") {
+      dateFilter = { startDate: { $lt: now } }; // Past events only
+    } else {
+      return res.status(400).json({
+        message: "Invalid eventStatus parameter. Use 'PAST' or 'UPCOMING'.",
+      });
+    }
+    const events = await Event.find({
+      ...searchFilter,
+      ...dateFilter, // Add the date filter based on eventStatus
+    })
       .skip(skip)
       .limit(Number(pageSize))
       .sort({ startDate: 1 });
 
-    const totalRecords = await Event.countDocuments(searchFilter);
+    const totalRecords = await Event.countDocuments({
+      ...searchFilter,
+      ...dateFilter, // Add the date filter based on eventStatus
+    });
 
     if (req.user) {
       const userId = req.user.id;

@@ -92,17 +92,17 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
 
     if (!name) newErrors.name = "Event Name is required.";
 
-    if (!rsvpStartDate || new Date(rsvpStartDate) < now) {
-      newErrors.rsvpStartDate = "RSVP start must be in the future.";
-    }
+    // if (!rsvpStartDate || new Date(rsvpStartDate) < now) {
+    //   newErrors.rsvpStartDate = "RSVP start must be in the future.";
+    // }
 
-    if (!startDate || new Date(startDate) < now) {
-      newErrors.startDate = "Start date/time must be in the future.";
-    }
+    // if (!startDate || new Date(startDate) < now) {
+    //   newErrors.startDate = "Start date/time must be in the future.";
+    // }
 
-    if (!endDate || new Date(endDate) < now || new Date(endDate) < new Date(startDate)) {
-      newErrors.endDate = "End date/time must be after start date/time and in the future.";
-    }
+    // if (!endDate || new Date(endDate) < now || new Date(endDate) < new Date(startDate)) {
+    //   newErrors.endDate = "End date/time must be after start date/time and in the future.";
+    // }
 
     if (!location) newErrors.location = "Location is required.";
     if (!description) newErrors.description = "Description is required.";

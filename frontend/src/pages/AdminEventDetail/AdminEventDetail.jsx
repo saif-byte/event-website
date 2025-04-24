@@ -45,7 +45,9 @@ const AdminEventDetailPage = () => {
       </Button>
 
       <Typography variant="h4" gutterBottom>{event.name}</Typography>
-      <Typography><strong>Date:</strong> {new Date(event.date).toLocaleString()}</Typography>
+      <Typography><strong>Start Date:</strong> {new Date(event.startDate).toLocaleString()}</Typography>
+      <Typography><strong>End Date:</strong> {new Date(event.endDate).toLocaleString()}</Typography>
+      <Typography><strong>RSVP Date:</strong> {new Date(event.rsvpStartDate).toLocaleString()}</Typography>
       <Typography><strong>Location:</strong> {event.location}</Typography>
       <Typography><strong>Description:</strong> {event.description}</Typography>
 
