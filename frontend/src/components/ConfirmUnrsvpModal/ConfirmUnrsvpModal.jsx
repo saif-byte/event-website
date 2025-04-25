@@ -9,10 +9,10 @@ const ConfirmUnrsvpModal = ({ event, onConfirm, onClose }) => {
         <h3>Are you sure you want to unregister from this event?</h3>
         <p>{event.name}</p>
         <div className="modal-buttons-rsvp">
-          <button onClick={onConfirm} className="confirm-button-rsvp">
+          <button onClick={onConfirm} className="confirm-button-unrsvp">
             Yes, Unregister
           </button>
-          <button onClick={onClose} className="cancel-button-rsvp">
+          <button onClick={onClose} className="cancel-button-unrsvp">
             No, Cancel
           </button>
         </div>

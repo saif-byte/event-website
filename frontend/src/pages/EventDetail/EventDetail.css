@@ -1,0 +1,46 @@
+.event-detail-container{
+    display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 12px;
+}
+.event-name{
+    color: var(--primary);
+}
+.event-details-box{
+    display: flex;
+    flex-wrap: wrap;
+
+    width: 80%;
+}
+.event-location , .event-price ,.event-date {
+    margin: 8px 0px;
+}
+
+.detail-side{
+    flex: 1 
+}
+.note-side{
+    margin-top: 16px;
+    flex: 1 ;
+    background: var(--accent);
+    padding: 16px;
+    border-radius: 12px;
+    color: black;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start
+}
+.info-icon{
+    color: var(--primary);
+    width: 18px;
+    margin-top: 20px;
+}
+
+.button-box{
+    width: 80%;
+    display: flex;
+    justify-content: end;
+    margin: inherit;
+}

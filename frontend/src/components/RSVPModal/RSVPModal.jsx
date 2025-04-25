@@ -8,10 +8,10 @@ export default function RSVPModal({ event,onConfirm ,  onClose }) {
     <div className="modal-overlay">
       <div className="above-modal-content-rsvp">
       <div className="modal-content-rsvp">
-        <h3>Thankyou for showing interest your are RSVP’D to the event</h3>
-        <p>The Event Details are shown below and also been email to you</p>
-
-        <div className="event-info">
+        <h3>Thank you for your interest.</h3>
+        <p>We are excited to welcome you for this event</p>
+        <h4>Are you sure you want to register for the event</h4>
+        {/* <div className="event-info">
           <p><strong>{event.name}</strong></p>
           <p className="event-description-rsvp">{event.description}</p>
           <div className="event-details-rsvp">
@@ -28,7 +28,7 @@ export default function RSVPModal({ event,onConfirm ,  onClose }) {
               {event.location}
             </div>
           </div>
-        </div>
+        </div> */}
 
         <div className="modal-buttons-rsvp">
           <button className="confirm-button-rsvp" onClick={onConfirm}>Confirm</button>

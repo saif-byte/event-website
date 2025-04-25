@@ -213,15 +213,15 @@ button {
   margin-top: 20px;
 }
 
-.confirm-button-rsvp,
-.cancel-button-rsvp {
+.confirm-button-unrsvp,
+.cancel-button-unrsvp {
   padding: 10px 20px;
   border: none;
   cursor: pointer;
   border-radius: 5px;
 }
 
-.confirm-button-rsvp {
+.confirm-button-unrsvp {
   background-color: var(--primary);
   color: white;
 }

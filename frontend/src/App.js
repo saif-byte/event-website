@@ -1,17 +1,27 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Dashboard from "./pages/Dashboard/Dashboard";  
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import Dashboard from "./pages/Dashboard/Dashboard";
 import { LoaderProvider } from "./context/LoaderContext";
 import SignupPage from "./pages/Signup/Signup";
 import Home from "./pages/Home/Home";
 import FAQ from "./pages/FAQ/Faq";
-
+import EventDetailPage from "./pages/EventDetail/EventDetail";
+import AdminEventDetailPage from "./pages/AdminEventDetail/AdminEventDetail";
 import Login from "./pages/Login/Login";
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer } from "react-toastify";
 import Contact from "./pages/Contact/Contact";
 
 // Protected route for non-authenticated users (Login, Signup)
 const AuthRoute = ({ children }) => {
-  return localStorage.getItem("token") ? <Navigate to="/dashboard" /> : children;
+  return localStorage.getItem("token") ? (
+    <Navigate to="/dashboard" />
+  ) : (
+    children
+  );
 };
 
 // Protected route for admin-only access (Dashboard)
@@ -19,6 +29,11 @@ const AdminRoute = ({ children }) => {
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user")); // Get role from localStorage
   return token && user?.role === "ADMIN" ? children : <Navigate to="/home" />;
+};
+// Protected route for any authenticated user
+const PrivateRoute = ({ children }) => {
+  const token = localStorage.getItem("token");
+  return token ? children : <Navigate to="/login" />;
 };
 
 function App() {
@@ -30,18 +45,55 @@ function App() {
           <Route path="/" element={<Navigate to="/home" />} />
 
           {/* Routes available only to non-authenticated users */}
-          <Route path="/login" element={<AuthRoute><Login /></AuthRoute>} />
-          <Route path="/signup" element={<AuthRoute><SignupPage /></AuthRoute>} />
+          <Route
+            path="/login"
+            element={
+              <AuthRoute>
+                <Login />
+              </AuthRoute>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <AuthRoute>
+                <SignupPage />
+              </AuthRoute>
+            }
+          />
+
+          {/* Routes available only to authenticated users */}
+          <Route
+            path="/events/rsvp"
+            element={
+              <PrivateRoute>
+                <EventDetailPage />
+              </PrivateRoute>
+            }
+          />
 
           {/* Route available to everyone */}
           <Route path="/home" element={<Home />} />
           <Route path="/faq" element={<FAQ />} />
           <Route path="/contact" element={<Contact />} />
 
-
-
           {/* Admin-only protected route */}
-          <Route path="/dashboard" element={<AdminRoute><Dashboard /></AdminRoute>} />
+          <Route
+            path="/dashboard"
+            element={
+              <AdminRoute>
+                <Dashboard />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path="/events/:eventId"
+            element={
+              <AdminRoute>
+                <AdminEventDetailPage />{" "}
+              </AdminRoute>
+            }
+          />
 
           {/* Catch-all route, redirect to home */}
           <Route path="*" element={<Navigate to="/home" />} />

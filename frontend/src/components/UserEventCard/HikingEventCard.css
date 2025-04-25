@@ -77,6 +77,8 @@
   border-radius: 12px;
   background: var(--accent);
   min-width: 400px;
+  height: 350px;
+  min-height: 350px;
 }
 .inner-event-card-container {
   clip-path: polygon(
@@ -157,7 +159,12 @@
 
   border-radius: 12px;
   background: rgb(69, 69, 6);
+  height: 350px;
+  min-height: 350px;
   scale: 0.93;
+}
+.event-content-box{
+  min-height: 200px;
 }
 .event-card-user {
   width: 100%;
@@ -203,13 +210,13 @@
 .event-description {
   font-size: 14px;
   line-height: 1.5;
-  max-height: 50px;
+  height: 75px;
   margin-bottom: 20px;
+  min-height: 50px;
 }
 
 .event-details {
   display: flex;
-  flex-direction: column;
   gap: 8px;
   margin-bottom: 20px;
 }
@@ -255,7 +262,70 @@
   cursor: pointer;
   font-size: 14px;
   border-radius: 5px;
-  margin-top: 10px;
+}
+.button-box-card{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.active-circle{
+  width: 12px;
+  height: 12px;  
+}
+.seats-remaining-box{
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.seats-remaining{
+  font-size: small;
+  color: white;
+}
+.soldout{
+  background: red;
+  color:white;
+  width: fit-content;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+
+}
+.people-icon{
+  height: 20px;
+}
+.see-more-link {
+  color: var(--accent);
+  font-weight: 500;
+  cursor: pointer;
+  margin-left: 6px;
+}
+
+.see-more-link:hover {
+  text-decoration: underline;
+}
+
+.remaining-seats{
+  display: flex;
+  align-items: center;
+  background-color: green;
+  gap:4px;
+  font-weight: bold ;
+  width: fit-content;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+.payment-pending-chip {
+  background-color: #ffcc00;
+  color: #333;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 /* Responsive adjustments */

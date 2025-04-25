@@ -6,7 +6,7 @@ import EventCard from "./EventCard";
 import { apiCall } from "../utils/api";
 // EventList.jsx
 
-const EventList = ({ events, loading, error, onSelectEvent, onEditEvent }) => {
+const EventList = ({ events, loading, error, onViewDetails, onEditEvent }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [selectedEventId, setSelectedEventId] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -54,7 +54,7 @@ const EventList = ({ events, loading, error, onSelectEvent, onEditEvent }) => {
       ) : events.length > 0 ? (
         events.map((event) => (
           <div key={event._id} style={{ position: "relative" }}>
-            <EventCard event={event} onSelectEvent={onSelectEvent} />
+            <EventCard event={event} onViewDetails={onViewDetails} />
             {isAdmin && (
               <>
                 <IconButton

@@ -1,40 +1,54 @@
 import React from "react";
-import { Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
+import {
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Box,
+} from "@mui/material";
 
 const ContactUsers = ({ contacts }) => {
   return (
-    <div className="contact-users">
-      <Typography variant="h5" gutterBottom>Contact Submissions</Typography>
+    <Box sx={{ mt: 4 }}>
+     
 
-      {contacts?.length > 0 ? (
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell><strong>Name</strong></TableCell>
-                <TableCell><strong>Email</strong></TableCell>
-                <TableCell><strong>Phone</strong></TableCell>
-                <TableCell><strong>Message</strong></TableCell>
-                <TableCell><strong>Submitted Date</strong></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {contacts.map((contact) => (
-                <TableRow key={contact._id}>
+      <TableContainer component={Paper} sx={{ borderRadius: 3, boxShadow: 2 }}>
+        <Table>
+          <TableHead>
+            <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
+              <TableCell><strong>Name</strong></TableCell>
+              <TableCell><strong>Email</strong></TableCell>
+              <TableCell><strong>Phone</strong></TableCell>
+              <TableCell><strong>Message</strong></TableCell>
+              <TableCell><strong>Submitted Date</strong></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {contacts?.length > 0 ? (
+              contacts.map((contact) => (
+                <TableRow key={contact._id} hover>
                   <TableCell>{contact.name} {contact.lastName}</TableCell>
                   <TableCell>{contact.email}</TableCell>
-                  <TableCell>{contact.phoneNo}</TableCell>
+                  <TableCell>{contact.phoneNo || "-"}</TableCell>
                   <TableCell>{contact.message}</TableCell>
                   <TableCell>{new Date(contact.createdAt).toLocaleDateString()}</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      ) : (
-        <Typography>No contact submissions found.</Typography>
-      )}
-    </div>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} align="center" sx={{ py: 3, fontStyle: "italic", color: "gray" }}>
+                  No contact submissions found.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
   );
 };
 

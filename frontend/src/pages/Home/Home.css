@@ -27,6 +27,24 @@
 input {
   width: 100%;
 }
+.filter-buttons{
+  button{
+    font-size: 14px;
+  }
+  .upcoming-button{
+    border-top-left-radius:20px;
+    border-bottom-left-radius: 20px;
+   
+  }
+  .past-button{
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    }
+  .active{
+    background : var(--primary);
+    color: white;
+  }
+}
 
 /* Responsive Design */
 @media (max-width: 768px) {
