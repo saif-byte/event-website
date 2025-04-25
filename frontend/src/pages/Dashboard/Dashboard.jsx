@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Typography, Button , ButtonGroup } from "@mui/material";
+import {
+  Typography,
+  Button,
+  ButtonGroup,
+  Box,
+  Stack,
+  Paper,
+  Divider,
+} from "@mui/material";
 import { apiCall } from "../../utils/api";
 import { useNavigate } from "react-router-dom";
 
@@ -9,8 +17,6 @@ import ContactUsers from "../ContactUsers";
 import AdminLayout from "../../layouts/AdminLayout";
 
 import AddEventModal from "../../components/AddEventModal/AddEventModal";
-import "./Dashboard.css";
-import Header from "../Header/Header";
 import Pagination from "../../components/Pagination/Pagination";
 
 const Dashboard = () => {
@@ -24,25 +30,26 @@ const Dashboard = () => {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [eventToEdit, setEventToEdit] = useState(null);
   const [filterType, setFilterType] = useState("UPCOMING");
-  // Pagination states
+
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(6);
   const [totalRecords, setTotalRecords] = useState(0);
+
   const navigate = useNavigate();
+  const totalPages = Math.ceil(totalRecords / pageSize);
 
   const handleViewDetails = (event) => {
-    debugger
     navigate(`/events/${event._id}`, { state: { event } });
   };
+
   useEffect(() => {
     if (activeTab === "events") {
       fetchEvents();
     } else if (activeTab === "contacts") {
       fetchContacts();
     }
-  }, [activeTab, currentPage , filterType]);
+  }, [activeTab, currentPage, filterType]);
 
-  // Fetch events
   const fetchEvents = async () => {
     try {
       const response = await apiCall(
@@ -58,7 +65,6 @@ const Dashboard = () => {
     }
   };
 
-  // Fetch contacts
   const fetchContacts = async () => {
     try {
       const response = await apiCall("/contact/all", "GET");
@@ -70,7 +76,7 @@ const Dashboard = () => {
   };
 
   const handleDeleteEvent = (deletedEventId) => {
-    setEvents(events.filter(event => event._id !== deletedEventId));
+    setEvents(events.filter((event) => event._id !== deletedEventId));
   };
 
   const fetchRegisteredUsers = async (eventId) => {
@@ -84,7 +90,7 @@ const Dashboard = () => {
   };
 
   const handleEditEvent = (eventId) => {
-    const eventToEdit = events.find(event => event._id === eventId);
+    const eventToEdit = events.find((event) => event._id === eventId);
     setEventToEdit(eventToEdit);
     setOpenAddModal(true);
   };
@@ -100,30 +106,27 @@ const Dashboard = () => {
     setOpenAddModal(true);
   };
 
-  const totalPages = Math.ceil(totalRecords / pageSize);
-
   return (
-    <>
-        <AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
-
-      <div className="dashboard-layout">
-      
-        <div className="dashboard-content">
-         
-
-          {activeTab === "events" && (
-            <>
-            <div className="upper-container">
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={onAddEventClick}
-                style={{ marginBottom: "15px" }}
-              >
+    <AdminLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+      <Box
+        sx={{
+          padding: 3,
+          minHeight: "100vh",
+        }}
+      >
+        {activeTab === "events" && (
+          <Paper elevation={2} sx={{ padding: 3, borderRadius: 3 }}>
+            <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+              <Typography variant="h5" fontWeight="bold">
+                Events Dashboard
+              </Typography>
+              <Button variant="contained" onClick={onAddEventClick}>
                 + Add Event
               </Button>
-               {/* Filter Buttons */}
-               <ButtonGroup style={{ marginBottom: "20px" }}>
+            </Stack>
+
+            <Box mb={3}>
+              <ButtonGroup>
                 <Button
                   variant={filterType === "UPCOMING" ? "contained" : "outlined"}
                   onClick={() => setFilterType("UPCOMING")}
@@ -137,46 +140,55 @@ const Dashboard = () => {
                   Past
                 </Button>
               </ButtonGroup>
-              </div>
+            </Box>
 
-              {selectedEvent ? (
-                <RegisteredUsers
-                  registeredUsers={registeredUsers}
-                  eventId ={selectedEvent}
-                  onBack={() => setSelectedEvent(null)}
-                />
-              ) : (
-                <EventList
+            <Divider sx={{ mb: 3 }} />
+
+            {selectedEvent ? (
+              <RegisteredUsers
+                registeredUsers={registeredUsers}
+                eventId={selectedEvent}
+                onBack={() => setSelectedEvent(null)}
+              />
+            ) : (
+              <EventList
                 events={events}
                 loading={loading}
                 error={error}
                 onDeleteEvent={handleDeleteEvent}
                 onViewDetails={handleViewDetails}
                 onEditEvent={handleEditEvent}
+                fetchRegisteredUsers={fetchRegisteredUsers}
               />
-              
-              )}
+            )}
 
-              <Pagination 
+            <Box mt={3}>
+              <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
                 onPageChange={handlePageChange}
               />
-            </>
-          )}
+            </Box>
+          </Paper>
+        )}
 
-          {activeTab === "contacts" && (
-            <ContactUsers
-            contacts={contacts}
-             
-            />
-          )}
+        {activeTab === "contacts" && (
+          <Paper elevation={2} sx={{ padding: 3, borderRadius: 3 }}>
+            <Typography variant="h5" fontWeight="bold" mb={2}>
+              Contact Submissions
+            </Typography>
+            <ContactUsers contacts={contacts} />
+          </Paper>
+        )}
 
-          {activeTab === "users" && (
-            <Typography variant="h6">User Management Coming Soon...</Typography>
-          )}
-        </div>
-      </div>
+        {activeTab === "users" && (
+          <Paper elevation={2} sx={{ padding: 3, borderRadius: 3 }}>
+            <Typography variant="h6">
+              User Management Coming Soon...
+            </Typography>
+          </Paper>
+        )}
+      </Box>
 
       <AddEventModal
         open={openAddModal}
@@ -184,8 +196,7 @@ const Dashboard = () => {
         refreshEvents={fetchEvents}
         eventToEdit={eventToEdit}
       />
-      </AdminLayout>
-    </>
+    </AdminLayout>
   );
 };
 

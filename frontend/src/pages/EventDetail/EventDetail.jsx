@@ -44,6 +44,7 @@ const handleRSVPConfirm = async () => {
       const response = await apiCall(`/events/${event._id}/register`, "POST");
       setResponseMessage(response.message);
       setIsResponseModalOpen(true);
+      event.isAlreadyRegistered = true
            
     } catch (error) {
       setResponseMessage(error.message);

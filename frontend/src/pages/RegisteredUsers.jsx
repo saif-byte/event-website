@@ -56,26 +56,23 @@ const RegisteredUsers = ({ registeredUsers, eventId, onBack, refreshEvent }) => 
         Registered Users
       </Typography>
 
-      {registeredUsers.length > 0 ? (
-        <TableContainer component={Paper} sx={{ borderRadius: 3, boxShadow: 2 }}>
-          <Table>
-            <TableHead>
-              <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
-                <TableCell><strong>Name</strong></TableCell>
-                <TableCell><strong>Email</strong></TableCell>
-                <TableCell><strong>Instagram</strong></TableCell>
-                <TableCell><strong>Gender</strong></TableCell>
-                <TableCell><strong>Registered Date</strong></TableCell>
-                <TableCell><strong>Payment</strong></TableCell>
-                <TableCell><strong>Actions</strong></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {registeredUsers.map((user) => (
-                <TableRow
-                  key={user.userId._id}
-                  hover
-                >
+      <TableContainer component={Paper} sx={{ borderRadius: 3, boxShadow: 2 }}>
+        <Table>
+          <TableHead>
+            <TableRow sx={{ backgroundColor: "#f5f5f5" }}>
+              <TableCell><strong>Name</strong></TableCell>
+              <TableCell><strong>Email</strong></TableCell>
+              <TableCell><strong>Instagram</strong></TableCell>
+              <TableCell><strong>Gender</strong></TableCell>
+              <TableCell><strong>Registered Date</strong></TableCell>
+              <TableCell><strong>Payment</strong></TableCell>
+              <TableCell><strong>Actions</strong></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {registeredUsers.length > 0 ? (
+              registeredUsers.map((user) => (
+                <TableRow key={user.userId._id} hover>
                   <TableCell>{user.userId.name}</TableCell>
                   <TableCell>{user.userId.email}</TableCell>
                   <TableCell>{user.userId.instagramHandle || "-"}</TableCell>
@@ -100,13 +97,17 @@ const RegisteredUsers = ({ registeredUsers, eventId, onBack, refreshEvent }) => 
                     </IconButton>
                   </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      ) : (
-        <Typography sx={{ mt: 2 }}>No users registered.</Typography>
-      )}
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={7} align="center" sx={{ py: 3, fontStyle: "italic", color: "gray" }}>
+                  No users registered.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         <MenuItem onClick={handleMarkAsPaid}>Mark Payment as Done</MenuItem>

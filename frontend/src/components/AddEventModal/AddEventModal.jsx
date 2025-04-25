@@ -103,6 +103,9 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
     // if (!endDate || new Date(endDate) < now || new Date(endDate) < new Date(startDate)) {
     //   newErrors.endDate = "End date/time must be after start date/time and in the future.";
     // }
+    if(!rsvpStartDate) newErrors.rsvpStartDate = "RSVP Start Date is required.";
+    if(!startDate) newErrors.startDate = "Start Date is required.";
+    if(!endDate) newErrors.endDate = "End Date is required.";
 
     if (!location) newErrors.location = "Location is required.";
     if (!description) newErrors.description = "Description is required.";
@@ -125,6 +128,7 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
 
   const handleSubmit = async () => {
     try {
+      debugger
       if (eventToEdit) {
         await apiCall(`/events/${eventToEdit._id}`, "PUT", eventData);
       } else {
