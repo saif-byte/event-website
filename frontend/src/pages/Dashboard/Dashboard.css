@@ -100,7 +100,11 @@
   text-decoration: underline;
 }
 
-
+.upper-container{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 /* ============ Responsive Sidebar ============ */
 @media (max-width: 768px) {
   .sidebar {

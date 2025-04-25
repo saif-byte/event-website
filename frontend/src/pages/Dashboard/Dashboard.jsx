@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Typography, Button } from "@mui/material";
+import { Typography, Button , ButtonGroup } from "@mui/material";
 import { apiCall } from "../../utils/api";
 import { useNavigate } from "react-router-dom";
 
@@ -23,7 +23,7 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("events");
   const [openAddModal, setOpenAddModal] = useState(false);
   const [eventToEdit, setEventToEdit] = useState(null);
-
+  const [filterType, setFilterType] = useState("UPCOMING");
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(6);
@@ -40,13 +40,13 @@ const Dashboard = () => {
     } else if (activeTab === "contacts") {
       fetchContacts();
     }
-  }, [activeTab, currentPage]);
+  }, [activeTab, currentPage , filterType]);
 
   // Fetch events
   const fetchEvents = async () => {
     try {
       const response = await apiCall(
-        `/events?page=${currentPage}&pageSize=${pageSize}`,
+        `/events?page=${currentPage}&pageSize=${pageSize}&eventStatus=${filterType}`,
         "GET"
       );
       setEvents(response.events);
@@ -113,6 +113,7 @@ const Dashboard = () => {
 
           {activeTab === "events" && (
             <>
+            <div className="upper-container">
               <Button
                 variant="contained"
                 color="primary"
@@ -121,6 +122,22 @@ const Dashboard = () => {
               >
                 + Add Event
               </Button>
+               {/* Filter Buttons */}
+               <ButtonGroup style={{ marginBottom: "20px" }}>
+                <Button
+                  variant={filterType === "UPCOMING" ? "contained" : "outlined"}
+                  onClick={() => setFilterType("UPCOMING")}
+                >
+                  Upcoming
+                </Button>
+                <Button
+                  variant={filterType === "PAST" ? "contained" : "outlined"}
+                  onClick={() => setFilterType("PAST")}
+                >
+                  Past
+                </Button>
+              </ButtonGroup>
+              </div>
 
               {selectedEvent ? (
                 <RegisteredUsers
