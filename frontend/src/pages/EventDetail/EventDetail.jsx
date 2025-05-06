@@ -139,6 +139,8 @@ const handleRSVPConfirm = async () => {
     </button>
   ) : (
     <button
+    disabled={event.remainingSeatsForUserGender === 0 || new Date(event.rsvpEndDate) < new Date()}
+
       className="confirm-button-rsvp"
       onClick={() => setIsRSVPModalOpen(true)}        // Call the RSVP handler
     >

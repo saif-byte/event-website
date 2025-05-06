@@ -92,20 +92,23 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
 
     if (!name) newErrors.name = "Event Name is required.";
 
-    // if (!rsvpStartDate || new Date(rsvpStartDate) < now) {
-    //   newErrors.rsvpStartDate = "RSVP start must be in the future.";
-    // }
+    // Event start date must be in the future AND after RSVP start
+    if (!startDate || new Date(startDate) < now) {
+      newErrors.startDate = "Event start must be in the future.";
+    } else if (new Date(startDate) < new Date(rsvpStartDate)) {
+      newErrors.startDate = "Event start must be after RSVP start.";
+    }
 
-    // if (!startDate || new Date(startDate) < now) {
-    //   newErrors.startDate = "Start date/time must be in the future.";
-    // }
-
-    // if (!endDate || new Date(endDate) < now || new Date(endDate) < new Date(startDate)) {
-    //   newErrors.endDate = "End date/time must be after start date/time and in the future.";
-    // }
-    if(!rsvpStartDate) newErrors.rsvpStartDate = "RSVP Start Date is required.";
-    if(!startDate) newErrors.startDate = "Start Date is required.";
-    if(!endDate) newErrors.endDate = "End Date is required.";
+    // Event end date must be in the future AND after start date
+    if (!endDate || new Date(endDate) < now) {
+      newErrors.endDate = "Event end must be in the future.";
+    } else if (new Date(endDate) < new Date(startDate)) {
+      newErrors.endDate = "Event end must be after the event start.";
+    }
+    if (!rsvpStartDate)
+      newErrors.rsvpStartDate = "RSVP Start Date is required.";
+    if (!startDate) newErrors.startDate = "Start Date is required.";
+    if (!endDate) newErrors.endDate = "End Date is required.";
 
     if (!location) newErrors.location = "Location is required.";
     if (!description) newErrors.description = "Description is required.";
@@ -128,7 +131,7 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
 
   const handleSubmit = async () => {
     try {
-      debugger
+      debugger;
       if (eventToEdit) {
         await apiCall(`/events/${eventToEdit._id}`, "PUT", eventData);
       } else {
@@ -157,7 +160,9 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
   return (
     <>
       <Dialog open={open} onClose={onClose} fullWidth>
-        <DialogTitle>{eventToEdit ? "Edit Event" : "Add New Event"}</DialogTitle>
+        <DialogTitle>
+          {eventToEdit ? "Edit Event" : "Add New Event"}
+        </DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
@@ -180,7 +185,6 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
             error={!!errors.rsvpStartDate}
             helperText={errors.rsvpStartDate}
             InputLabelProps={{ shrink: true }}
-            inputProps={{ min: minDateTime }}
           />
           <TextField
             fullWidth
@@ -278,7 +282,8 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
         </DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to {eventToEdit ? "update" : "add"} this event?
+            Are you sure you want to {eventToEdit ? "update" : "add"} this
+            event?
           </Typography>
         </DialogContent>
         <DialogActions>
