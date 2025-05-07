@@ -154,3 +154,8 @@
 .MuiDialog-paper {
   min-width: 400px;
 }
+
+button:disabled{
+  cursor: not-allowed;
+  opacity: 50%;
+}
