@@ -100,9 +100,25 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
     const now = new Date();
 
     if (!name) newErrors.name = "Event Name is required.";
-    if (!rsvpStartDate) newErrors.rsvpStartDate = "RSVP Start Date is required.";
+
+    // Event start date must be in the future AND after RSVP start
+    if (!startDate || new Date(startDate) < now) {
+      newErrors.startDate = "Event start must be in the future.";
+    } else if (new Date(startDate) < new Date(rsvpStartDate)) {
+      newErrors.startDate = "Event start must be after RSVP start.";
+    }
+
+    // Event end date must be in the future AND after start date
+    if (!endDate || new Date(endDate) < now) {
+      newErrors.endDate = "Event end must be in the future.";
+    } else if (new Date(endDate) < new Date(startDate)) {
+      newErrors.endDate = "Event end must be after the event start.";
+    }
+    if (!rsvpStartDate)
+      newErrors.rsvpStartDate = "RSVP Start Date is required.";
     if (!startDate) newErrors.startDate = "Start Date is required.";
     if (!endDate) newErrors.endDate = "End Date is required.";
+
     if (!location) newErrors.location = "Location is required.";
     if (!description) newErrors.description = "Description is required.";
 
@@ -173,7 +189,9 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
   return (
     <>
       <Dialog open={open} onClose={onClose} fullWidth>
-        <DialogTitle>{eventToEdit ? "Edit Event" : "Add New Event"}</DialogTitle>
+        <DialogTitle>
+          {eventToEdit ? "Edit Event" : "Add New Event"}
+        </DialogTitle>
         <DialogContent>
           <TextField
             fullWidth
@@ -196,7 +214,6 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
             error={!!errors.rsvpStartDate}
             helperText={errors.rsvpStartDate}
             InputLabelProps={{ shrink: true }}
-            inputProps={{ min: minDateTime }}
           />
           <TextField
             fullWidth
@@ -328,7 +345,8 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
         </DialogTitle>
         <DialogContent>
           <Typography>
-            Are you sure you want to {eventToEdit ? "update" : "add"} this event?
+            Are you sure you want to {eventToEdit ? "update" : "add"} this
+            event?
           </Typography>
         </DialogContent>
         <DialogActions>
