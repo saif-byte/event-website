@@ -34,12 +34,11 @@ router.get("/", optionalProtect, async (req, res) => {
     const searchFilter = search
       ? { name: { $regex: search, $options: "i" } }
       : {};
-    // Adjust the filter based on eventStatus
     let dateFilter;
     if (eventStatus === "UPCOMING") {
-      dateFilter = { startDate: { $gte: now } }; // Future events only
+      dateFilter = { startDate: { $gte: now } };
     } else if (eventStatus === "PAST") {
-      dateFilter = { startDate: { $lt: now } }; // Past events only
+      dateFilter = { startDate: { $lt: now } };
     } else {
       return res.status(400).json({
         message: "Invalid eventStatus parameter. Use 'PAST' or 'UPCOMING'.",
@@ -47,7 +46,7 @@ router.get("/", optionalProtect, async (req, res) => {
     }
     const events = await Event.find({
       ...searchFilter,
-      ...dateFilter, // Add the date filter based on eventStatus
+      ...dateFilter,
     })
       .skip(skip)
       .limit(Number(pageSize))
@@ -55,50 +54,82 @@ router.get("/", optionalProtect, async (req, res) => {
 
     const totalRecords = await Event.countDocuments({
       ...searchFilter,
-      ...dateFilter, // Add the date filter based on eventStatus
+      ...dateFilter,
+    });
+
+    events.forEach((event) => {
+      // Always calculate remaining seats before deleting registeredUsers
+      if (event.seatType === "TOTAL") {
+        const registeredCount = event.registeredUsers.length;
+        event._doc.remainingTotalSeats = Math.max(
+          (event.totalSeats || 0) - registeredCount,
+          0
+        );
+      } else if (event.seatType === "GENDER_BASED") {
+        // For gender-based, calculate for both genders (useful for public listing)
+        const maleRegisteredCount = event.registeredUsers.filter(
+          (user) => user.gender === "MALE" || user.gender === "OTHER"
+        ).length;
+        const femaleRegisteredCount = event.registeredUsers.filter(
+          (user) => user.gender === "FEMALE"
+        ).length;
+
+        event._doc.remainingMaleSeats = Math.max(
+          (event.maleSeats || 0) - maleRegisteredCount,
+          0
+        );
+        event._doc.remainingFemaleSeats = Math.max(
+          (event.femaleSeats || 0) - femaleRegisteredCount,
+          0
+        );
+      }
     });
 
     if (req.user) {
       const userId = req.user.id;
       const userGender = req.user.gender;
 
-      // Attach `isAlreadyRegistered` and `paymentPending` for each event
       events.forEach((event) => {
         const registeredUser = event.registeredUsers.find(
           (user) => user.userId.toString() === userId
         );
 
-        if (registeredUser) {
-          event._doc.isAlreadyRegistered = true;
-          event._doc.paymentPending = registeredUser.paymentPending;
-        } else {
-          event._doc.isAlreadyRegistered = false;
-          event._doc.paymentPending = null; // or false if you prefer
-        }
-        // Count how many seats are already taken for the user's gender
-        const registeredCount = event.registeredUsers.filter((user) => {
-          if (userGender === "OTHER") {
-            return user.gender === "MALE" || user.gender === "OTHER";
-          } else {
-            return user.gender === userGender;
-          }
-        }).length;
+        event._doc.isAlreadyRegistered = !!registeredUser;
+        event._doc.paymentPending = registeredUser
+          ? registeredUser.paymentPending
+          : null;
 
-        let totalSeatsForGender = 0;
-        if (userGender === "MALE" || userGender === "OTHER")
-          totalSeatsForGender = event.maleSeats;
-        else if (userGender === "FEMALE")
-          totalSeatsForGender = event.femaleSeats;
-        event._doc.remainingSeatsForUserGender = Math.max(
-          totalSeatsForGender - registeredCount,
-          0
-        );
-        event._doc.totalSeatsForGender = totalSeatsForGender;
-        // Optionally: remove registeredUsers from response
+        // For authenticated users, also provide remaining seats for their gender
+        if (event.seatType === "GENDER_BASED") {
+          let totalSeatsForGender = 0;
+          let registeredCount = 0;
+          if (userGender === "MALE" || userGender === "OTHER") {
+            totalSeatsForGender = event.maleSeats || 0;
+            registeredCount = event.registeredUsers.filter(
+              (user) => user.gender === "MALE" || user.gender === "OTHER"
+            ).length;
+          } else if (userGender === "FEMALE") {
+            totalSeatsForGender = event.femaleSeats || 0;
+            registeredCount = event.registeredUsers.filter(
+              (user) => user.gender === "FEMALE"
+            ).length;
+          }
+          event._doc.remainingSeatsForUserGender = Math.max(
+            totalSeatsForGender - registeredCount,
+            0
+          );
+          event._doc.totalSeatsForUserGender = totalSeatsForGender;
+        } else if (event.seatType === "TOTAL") {
+          // For total, remainingTotalSeats already set above
+          event._doc.remainingSeatsForUserGender = event._doc.remainingTotalSeats;
+          event._doc.totalSeatsForUserGender = event.totalSeats || 0;
+        }
+
+        // Remove registeredUsers from response
         delete event._doc.registeredUsers;
       });
     } else {
-      // If user not authenticated, remove registeredUsers for public response
+      // For public, just remove registeredUsers
       events.forEach((event) => {
         delete event._doc.registeredUsers;
       });
@@ -116,6 +147,7 @@ router.get("/", optionalProtect, async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 });
+
 
 // @route   POST /api/events
 // @desc    Create a new event (Admin Only)
