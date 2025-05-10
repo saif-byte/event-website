@@ -7,6 +7,7 @@ import {
   TextField,
   Button,
   Typography,
+  MenuItem,
 } from "@mui/material";
 import { apiCall } from "../../utils/api";
 
@@ -18,6 +19,8 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
     endDate: "",
     location: "",
     description: "",
+    seatType: "GENDER_BASED", // default to GENDER_BASED for backward compatibility
+    totalSeats: "",
     maleSeats: "",
     femaleSeats: "",
     price: "",
@@ -49,8 +52,10 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
         endDate: formatDateTime(eventToEdit.endDate),
         location: eventToEdit.location,
         description: eventToEdit.description,
-        maleSeats: eventToEdit.maleSeats,
-        femaleSeats: eventToEdit.femaleSeats,
+        seatType: eventToEdit.seatType || "GENDER_BASED",
+        totalSeats: eventToEdit.totalSeats || "",
+        maleSeats: eventToEdit.maleSeats || "",
+        femaleSeats: eventToEdit.femaleSeats || "",
         price: eventToEdit.price,
       });
     } else {
@@ -61,6 +66,8 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
         endDate: "",
         location: "",
         description: "",
+        seatType: "GENDER_BASED",
+        totalSeats: "",
         maleSeats: "",
         femaleSeats: "",
         price: "",
@@ -83,6 +90,8 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
       endDate,
       location,
       description,
+      seatType,
+      totalSeats,
       maleSeats,
       femaleSeats,
       price,
@@ -113,10 +122,19 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
     if (!location) newErrors.location = "Location is required.";
     if (!description) newErrors.description = "Description is required.";
 
-    if (!maleSeats || parseInt(maleSeats) < 0)
-      newErrors.maleSeats = "Male Seats are required.";
-    if (!femaleSeats || parseInt(femaleSeats) < 0)
-      newErrors.femaleSeats = "Female Seats are required.";
+    if (!seatType) newErrors.seatType = "Seat type is required.";
+
+    if (seatType === "TOTAL") {
+      if (!totalSeats || parseInt(totalSeats) < 1) {
+        newErrors.totalSeats = "Total Seats are required and must be at least 1.";
+      }
+    } else if (seatType === "GENDER_BASED") {
+      if (!maleSeats || parseInt(maleSeats) < 0)
+        newErrors.maleSeats = "Male Seats are required.";
+      if (!femaleSeats || parseInt(femaleSeats) < 0)
+        newErrors.femaleSeats = "Female Seats are required.";
+    }
+
     if (!price || parseFloat(price) < 0) newErrors.price = "Price is required.";
 
     setErrors(newErrors);
@@ -131,11 +149,20 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
 
   const handleSubmit = async () => {
     try {
-      debugger;
+      let payload = { ...eventData };
+
+      // Remove unused seat fields based on seatType
+      if (payload.seatType === "TOTAL") {
+        payload.maleSeats = undefined;
+        payload.femaleSeats = undefined;
+      } else if (payload.seatType === "GENDER_BASED") {
+        payload.totalSeats = undefined;
+      }
+
       if (eventToEdit) {
-        await apiCall(`/events/${eventToEdit._id}`, "PUT", eventData);
+        await apiCall(`/events/${eventToEdit._id}`, "PUT", payload);
       } else {
-        await apiCall("/events", "POST", eventData);
+        await apiCall("/events", "POST", payload);
       }
       refreshEvents();
       setConfirmOpen(false);
@@ -147,6 +174,8 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
         endDate: "",
         location: "",
         description: "",
+        seatType: "GENDER_BASED",
+        totalSeats: "",
         maleSeats: "",
         femaleSeats: "",
         price: "",
@@ -232,28 +261,63 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
             error={!!errors.description}
             helperText={errors.description}
           />
+
+          {/* New seat type selector */}
           <TextField
+            select
             fullWidth
             margin="dense"
-            label="Male Seats"
-            name="maleSeats"
-            type="number"
-            value={eventData.maleSeats}
+            label="Seat Type"
+            name="seatType"
+            value={eventData.seatType}
             onChange={handleChange}
-            error={!!errors.maleSeats}
-            helperText={errors.maleSeats}
-          />
-          <TextField
-            fullWidth
-            margin="dense"
-            label="Female Seats"
-            name="femaleSeats"
-            type="number"
-            value={eventData.femaleSeats}
-            onChange={handleChange}
-            error={!!errors.femaleSeats}
-            helperText={errors.femaleSeats}
-          />
+            error={!!errors.seatType}
+            helperText={errors.seatType}
+          >
+            <MenuItem value="GENDER_BASED">Separate seats for gender</MenuItem>
+            <MenuItem value="TOTAL">Total seats (no gender distinction)</MenuItem>
+          </TextField>
+
+          {/* Conditionally render seat fields */}
+          {eventData.seatType === "TOTAL" ? (
+            <TextField
+              fullWidth
+              margin="dense"
+              label="Total Seats"
+              name="totalSeats"
+              type="number"
+              value={eventData.totalSeats}
+              onChange={handleChange}
+              error={!!errors.totalSeats}
+              helperText={errors.totalSeats}
+            />
+          ) : (
+            <>
+              <TextField
+                fullWidth
+                margin="dense"
+                label="Male Seats"
+                name="maleSeats"
+                type="number"
+                value={eventData.maleSeats}
+                onChange={handleChange}
+                error={!!errors.maleSeats}
+                helperText={errors.maleSeats}
+              />
+              <TextField
+                fullWidth
+                margin="dense"
+                label="Female Seats"
+                name="femaleSeats"
+                type="number"
+                value={eventData.femaleSeats}
+                onChange={handleChange}
+                error={!!errors.femaleSeats}
+                helperText={errors.femaleSeats}
+              />
+            </>
+          )}
+
           <TextField
             fullWidth
             margin="dense"
@@ -275,7 +339,6 @@ const AddEventModal = ({ open, onClose, refreshEvents, eventToEdit }) => {
           </Button>
         </DialogActions>
       </Dialog>
-
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
         <DialogTitle>
           Confirm Event {eventToEdit ? "Update" : "Creation"}

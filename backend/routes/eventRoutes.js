@@ -2,7 +2,7 @@ const express = require("express");
 const authMiddleware = require("../middleware/authMiddleware"); // Import authentication middleware
 
 const router = express.Router();
-const { check, validationResult } = require("express-validator");
+const { check, validationResult, body } = require("express-validator");
 const Event = require("../models/Event");
 const {
   protect,
@@ -34,12 +34,11 @@ router.get("/", optionalProtect, async (req, res) => {
     const searchFilter = search
       ? { name: { $regex: search, $options: "i" } }
       : {};
-    // Adjust the filter based on eventStatus
     let dateFilter;
     if (eventStatus === "UPCOMING") {
-      dateFilter = { startDate: { $gte: now } }; // Future events only
+      dateFilter = { startDate: { $gte: now } };
     } else if (eventStatus === "PAST") {
-      dateFilter = { startDate: { $lt: now } }; // Past events only
+      dateFilter = { startDate: { $lt: now } };
     } else {
       return res.status(400).json({
         message: "Invalid eventStatus parameter. Use 'PAST' or 'UPCOMING'.",
@@ -47,7 +46,7 @@ router.get("/", optionalProtect, async (req, res) => {
     }
     const events = await Event.find({
       ...searchFilter,
-      ...dateFilter, // Add the date filter based on eventStatus
+      ...dateFilter,
     })
       .skip(skip)
       .limit(Number(pageSize))
@@ -55,50 +54,82 @@ router.get("/", optionalProtect, async (req, res) => {
 
     const totalRecords = await Event.countDocuments({
       ...searchFilter,
-      ...dateFilter, // Add the date filter based on eventStatus
+      ...dateFilter,
+    });
+
+    events.forEach((event) => {
+      // Always calculate remaining seats before deleting registeredUsers
+      if (event.seatType === "TOTAL") {
+        const registeredCount = event.registeredUsers.length;
+        event._doc.remainingTotalSeats = Math.max(
+          (event.totalSeats || 0) - registeredCount,
+          0
+        );
+      } else if (event.seatType === "GENDER_BASED") {
+        // For gender-based, calculate for both genders (useful for public listing)
+        const maleRegisteredCount = event.registeredUsers.filter(
+          (user) => user.gender === "MALE" || user.gender === "OTHER"
+        ).length;
+        const femaleRegisteredCount = event.registeredUsers.filter(
+          (user) => user.gender === "FEMALE"
+        ).length;
+
+        event._doc.remainingMaleSeats = Math.max(
+          (event.maleSeats || 0) - maleRegisteredCount,
+          0
+        );
+        event._doc.remainingFemaleSeats = Math.max(
+          (event.femaleSeats || 0) - femaleRegisteredCount,
+          0
+        );
+      }
     });
 
     if (req.user) {
       const userId = req.user.id;
       const userGender = req.user.gender;
 
-      // Attach `isAlreadyRegistered` and `paymentPending` for each event
       events.forEach((event) => {
         const registeredUser = event.registeredUsers.find(
           (user) => user.userId.toString() === userId
         );
 
-        if (registeredUser) {
-          event._doc.isAlreadyRegistered = true;
-          event._doc.paymentPending = registeredUser.paymentPending;
-        } else {
-          event._doc.isAlreadyRegistered = false;
-          event._doc.paymentPending = null; // or false if you prefer
-        }
-        // Count how many seats are already taken for the user's gender
-        const registeredCount = event.registeredUsers.filter((user) => {
-          if (userGender === "OTHER") {
-            return user.gender === "MALE" || user.gender === "OTHER";
-          } else {
-            return user.gender === userGender;
-          }
-        }).length;
+        event._doc.isAlreadyRegistered = !!registeredUser;
+        event._doc.paymentPending = registeredUser
+          ? registeredUser.paymentPending
+          : null;
 
-        let totalSeatsForGender = 0;
-        if (userGender === "MALE" || userGender === "OTHER")
-          totalSeatsForGender = event.maleSeats;
-        else if (userGender === "FEMALE")
-          totalSeatsForGender = event.femaleSeats;
-        event._doc.remainingSeatsForUserGender = Math.max(
-          totalSeatsForGender - registeredCount,
-          0
-        );
-        event._doc.totalSeatsForGender = totalSeatsForGender;
-        // Optionally: remove registeredUsers from response
+        // For authenticated users, also provide remaining seats for their gender
+        if (event.seatType === "GENDER_BASED") {
+          let totalSeatsForGender = 0;
+          let registeredCount = 0;
+          if (userGender === "MALE" || userGender === "OTHER") {
+            totalSeatsForGender = event.maleSeats || 0;
+            registeredCount = event.registeredUsers.filter(
+              (user) => user.gender === "MALE" || user.gender === "OTHER"
+            ).length;
+          } else if (userGender === "FEMALE") {
+            totalSeatsForGender = event.femaleSeats || 0;
+            registeredCount = event.registeredUsers.filter(
+              (user) => user.gender === "FEMALE"
+            ).length;
+          }
+          event._doc.remainingSeatsForUserGender = Math.max(
+            totalSeatsForGender - registeredCount,
+            0
+          );
+          event._doc.totalSeatsForUserGender = totalSeatsForGender;
+        } else if (event.seatType === "TOTAL") {
+          // For total, remainingTotalSeats already set above
+          event._doc.remainingSeatsForUserGender = event._doc.remainingTotalSeats;
+          event._doc.totalSeatsForUserGender = event.totalSeats || 0;
+        }
+
+        // Remove registeredUsers from response
         delete event._doc.registeredUsers;
       });
     } else {
-      // If user not authenticated, remove registeredUsers for public response
+      // For public, just remove registeredUsers
       events.forEach((event) => {
         delete event._doc.registeredUsers;
       });
@@ -117,7 +148,6 @@ router.get("/", optionalProtect, async (req, res) => {
   }
 });
 
-module.exports = router;
 
 // @route   POST /api/events
 // @desc    Create a new event (Admin Only)
@@ -134,9 +164,38 @@ router.post(
       check("endDate", "End date is required").isISO8601(),
       check("location", "Location is required").not().isEmpty(),
       check("rsvpStartDate", "RSVP start date is required").isISO8601(),
-      check("maleSeats", "Number of male seats is required").isInt({ min: 0 }),
-      check("femaleSeats", "Number of female seats is required").isInt({
-        min: 0,
+      check("price", "Price is required").isNumeric(),
+      check("seatType", "Seat type is required and must be TOTAL or GENDER_BASED")
+        .not().isEmpty().withMessage("Seat type is required")
+  .isIn(["TOTAL", "GENDER_BASED"]).withMessage("Seat type must be TOTAL or GENDER_BASED"),
+
+      // Conditional validation for seats
+      body("seatType").custom((value, { req }) => {
+        if (value === "TOTAL") {
+          if (
+            typeof req.body.totalSeats === "undefined" ||
+            isNaN(req.body.totalSeats) ||
+            Number(req.body.totalSeats) < 1
+          ) {
+            throw new Error("totalSeats is required and must be a positive number when seatType is TOTAL");
+          }
+        } else if (value === "GENDER_BASED") {
+          if (
+            typeof req.body.maleSeats === "undefined" ||
+            isNaN(req.body.maleSeats) ||
+            Number(req.body.maleSeats) < 0
+          ) {
+            throw new Error("maleSeats is required and must be a non-negative number when seatType is GENDER_BASED");
+          }
+          if (
+            typeof req.body.femaleSeats === "undefined" ||
+            isNaN(req.body.femaleSeats) ||
+            Number(req.body.femaleSeats) < 0
+          ) {
+            throw new Error("femaleSeats is required and must be a non-negative number when seatType is GENDER_BASED");
+          }
+        }
+        return true;
       }),
     ],
   ],
@@ -144,6 +203,7 @@ router.post(
     const errors = validationResult(req);
     if (!errors.isEmpty())
       return res.status(400).json({ errors: errors.array() });
+
     const {
       name,
       description,
@@ -151,46 +211,47 @@ router.post(
       endDate,
       rsvpStartDate,
       location,
+      seatType,
+      totalSeats,
       maleSeats,
       femaleSeats,
       price,
     } = req.body;
 
-    const event = new Event({
+    // RSVP end date auto-assigned to event start date
+    const rsvpEndDate = startDate;
+
+    // Prepare event data based on seatType
+    const eventData = {
       name,
       description,
       startDate,
       endDate,
       rsvpStartDate,
-      rsvpEndDate: startDate, // auto-assign RSVP end date to event start date
+      rsvpEndDate,
       location,
-      maleSeats,
-      femaleSeats,
+      seatType,
       price,
       createdBy: req.user.id,
-    });
+    };
+
+    if (seatType === "TOTAL") {
+      eventData.totalSeats = totalSeats;
+    } else if (seatType === "GENDER_BASED") {
+      eventData.maleSeats = maleSeats;
+      eventData.femaleSeats = femaleSeats;
+    }
 
     try {
-      const event = new Event({
-        name,
-        description,
-        startDate,
-        endDate,
-        rsvpStartDate,
-        rsvpEndDate: startDate, // auto-assign RSVP end date to event start date
-        location,
-        maleSeats,
-        femaleSeats,
-        price,
-        createdBy: req.user.id,
-      });
+      const event = new Event(eventData);
       await event.save();
       res.status(201).json({ message: "Event created successfully", event });
     } catch (error) {
-      res.status(500).json({ message: error });
+      res.status(500).json({ message: error.message || error });
     }
   }
 );
+
 // @route   POST /api/events/:eventId/register
 // @desc    Register a user for an event (Users Only)
 // @access  Private
